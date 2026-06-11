@@ -8,6 +8,22 @@ module.exports = {
   darkMode: 'class',
   theme: {
     extend: {
+      maxWidth: {
+        '7xl': '100rem',
+      },
+      fontSize: {
+        'xs': ['var(--text-xs)', { lineHeight: 'var(--lh-xs, 1.5)' }],
+        'sm': ['var(--text-sm)', { lineHeight: 'var(--lh-sm, 1.5)' }],
+        'base': ['var(--text-base)', { lineHeight: 'var(--lh-base, 1.6)' }],
+        'lg': ['var(--text-lg)', { lineHeight: 'var(--lh-lg, 1.5)' }],
+        'xl': ['var(--text-xl)', { lineHeight: 'var(--lh-xl, 1.4)' }],
+        '2xl': ['var(--text-2xl)', { lineHeight: 'var(--lh-2xl, 1.35)' }],
+        '3xl': ['var(--text-3xl)', { lineHeight: 'var(--lh-3xl, 1.3)' }],
+        '4xl': ['var(--text-4xl)', { lineHeight: 'var(--lh-4xl, 1.2)' }],
+        '5xl': ['var(--text-5xl)', { lineHeight: 'var(--lh-5xl, 1.15)' }],
+        '6xl': ['var(--text-6xl)', { lineHeight: 'var(--lh-6xl, 1.1)' }],
+        '7xl': ['var(--text-7xl)', { lineHeight: 'var(--lh-7xl, 1.1)' }],
+      },
       colors: {
         primary: {
           50: '#eff6ff',

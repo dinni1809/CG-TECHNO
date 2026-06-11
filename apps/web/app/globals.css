@@ -9,6 +9,53 @@
     --color-primary: 30 58 138;
     --color-accent: 59 130 246;
     --color-brand-green: 21 90 44;
+
+    /* Responsive Typography - Mobile Default (< 768px) */
+    --text-xs: 0.875rem; /* 14px */
+    --text-sm: 0.9375rem; /* 15px */
+    --text-base: 1rem; /* 16px */
+    --text-lg: 1.125rem; /* 18px */
+    --text-xl: 1.25rem; /* 20px */
+    --text-2xl: 1.375rem; /* 22px */
+    --text-3xl: 1.625rem; /* 26px */
+    --text-4xl: 2rem; /* 32px */
+    --text-5xl: 2.375rem; /* 38px */
+    --text-6xl: 2.75rem; /* 44px */
+    --text-7xl: 3.25rem; /* 52px */
+  }
+
+  @media (min-width: 768px) {
+    :root {
+      /* Responsive Typography - Tablet (768px - 1023px) */
+      --text-xs: 0.9375rem; /* 15px */
+      --text-sm: 1rem; /* 16px */
+      --text-base: 1.125rem; /* 18px */
+      --text-lg: 1.25rem; /* 20px */
+      --text-xl: 1.375rem; /* 22px */
+      --text-2xl: 1.625rem; /* 26px */
+      --text-3xl: 2rem; /* 32px */
+      --text-4xl: 2.5rem; /* 40px */
+      --text-5xl: 3rem; /* 48px */
+      --text-6xl: 3.375rem; /* 54px */
+      --text-7xl: 4rem; /* 64px */
+    }
+  }
+
+  @media (min-width: 1024px) {
+    :root {
+      /* Responsive Typography - Desktop (1024px+) */
+      --text-xs: 1rem; /* 16px */
+      --text-sm: 1.125rem; /* 18px */
+      --text-base: 1.25rem; /* 20px */
+      --text-lg: 1.375rem; /* 22px */
+      --text-xl: 1.5rem; /* 24px */
+      --text-2xl: 1.875rem; /* 30px */
+      --text-3xl: 2.25rem; /* 36px */
+      --text-4xl: 3rem; /* 48px */
+      --text-5xl: 3.75rem; /* 60px */
+      --text-6xl: 4rem; /* 64px */
+      --text-7xl: 5rem; /* 80px */
+    }
   }
 
   * {
@@ -38,7 +85,7 @@
   }
 
   .section-padding {
-    @apply py-16 sm:py-20 lg:py-24;
+    @apply py-24 sm:py-32 lg:py-40;
   }
 
   .gradient-text {
@@ -54,20 +101,20 @@
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary-800 text-white font-semibold rounded-lg
-           hover:bg-primary-700 active:bg-primary-900 transition-all duration-200
+    @apply inline-flex items-center justify-center gap-3 px-8 py-4 bg-primary-800 text-white font-semibold rounded-xl
+           hover:bg-primary-700 active:bg-primary-900 transition-all duration-200 shadow-md hover:shadow-lg
            focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 border-2 border-primary-800 text-primary-800 font-semibold rounded-lg
+    @apply inline-flex items-center justify-center gap-3 px-8 py-4 border-2 border-primary-800 text-primary-800 font-semibold rounded-xl
            hover:bg-primary-800 hover:text-white transition-all duration-200
            focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
   }
 
   .btn-accent {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary-500 text-white font-semibold rounded-lg
-           hover:bg-primary-600 active:bg-primary-700 transition-all duration-200
+    @apply inline-flex items-center justify-center gap-3 px-8 py-4 bg-primary-500 text-white font-semibold rounded-xl
+           hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 shadow-md hover:shadow-lg
            focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2;
   }
 

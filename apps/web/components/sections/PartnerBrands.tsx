@@ -1,6 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { Handshake } from 'lucide-react';
+import { SectionHeader } from '../ui/SectionHeader';
 
 const brands = [
   { name: 'Dell', description: 'Enterprise Servers & Laptops' },
@@ -18,11 +20,16 @@ export function PartnerBrands() {
   const doubledBrands = [...brands, ...brands];
 
   return (
-    <section className="py-12 bg-gray-50 border-b border-gray-100 overflow-hidden">
+    <section className="py-20 bg-gray-50 border-b border-gray-100 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <p className="text-center text-xs font-bold uppercase tracking-widest text-gray-400 mb-8">
-          Authorized Integration & Support Partners
-        </p>
+        <SectionHeader
+          tag="Partner Brands"
+          tagIcon={Handshake}
+          title="Authorized Integration &"
+          titleHighlight="Support Partners"
+          description="We collaborate with the world's leading IT hardware and infrastructure manufacturers to deliver genuine, high-performance solutions."
+          className="mb-16 text-center"
+        />
         
         <div className="relative overflow-hidden w-full">
           <div className="flex gap-10 animate-marquee w-max py-2">

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { MapPin, Clock, Briefcase, TrendingUp, BookOpen, Users, Star, Shield } from 'lucide-react';
+import { MapPin, Clock, Briefcase, TrendingUp, BookOpen, Users, Star, Shield, GraduationCap, Award } from 'lucide-react';
 import { jobOpenings, companyPerks } from '@cg-techno/config';
 import { cn } from '@cg-techno/utils';
 import { AnimatedSection, StaggerContainer, StaggerItem } from '@/components/ui/AnimatedSection';
@@ -27,11 +27,12 @@ export default function CareersPage() {
 
   return (
     <>
-      <section className="relative bg-mesh bg-hero-pattern pt-28 pb-20 lg:pt-36 lg:pb-24">
+      <section className="relative bg-mesh bg-hero-pattern pt-24 pb-12 lg:pt-28 lg:pb-14">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <AnimatedSection>
-            <div className="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-semibold bg-white/10 border border-white/20 text-white/80 mb-5">
-              Join Our Team
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-semibold bg-white/10 border border-white/20 text-white/80 mb-5">
+              <GraduationCap size={16} className="text-blue-300" />
+              <span>Careers</span>
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-5">
               Build Your Career at{' '}
@@ -47,25 +48,26 @@ export default function CareersPage() {
         </div>
       </section>
 
-      <section className="py-20 bg-white">
+      <section className="pt-10 pb-28 lg:pt-14 lg:pb-36 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeader
             tag="Why CG Techno"
+            tagIcon={Award}
             title="Perks of Working"
             titleHighlight="With Us"
             className="mb-12"
           />
-          <StaggerContainer className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-5">
+          <StaggerContainer className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
             {companyPerks.map((perk) => {
               const Icon = perkIconMap[perk.icon] || Star;
               return (
                 <StaggerItem key={perk.title}>
-                  <div className="bg-gray-50 rounded-2xl p-5 text-center border border-gray-100 hover:border-primary-200 hover:bg-primary-50/30 transition-all group">
-                    <div className="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center mx-auto mb-3 group-hover:bg-primary-200 transition-colors">
-                      <Icon size={20} className="text-primary-700" />
+                  <div className="bg-gray-50 rounded-3xl p-6 text-center border border-gray-100 hover:border-primary-200 hover:bg-primary-50/30 transition-all group h-full flex flex-col justify-center">
+                    <div className="w-12 h-12 rounded-xl bg-primary-100 flex items-center justify-center mx-auto mb-4 group-hover:bg-primary-200 transition-colors shrink-0">
+                      <Icon size={22} className="text-primary-700" />
                     </div>
-                    <div className="text-xs font-bold text-gray-900 mb-1">{perk.title}</div>
-                    <div className="text-xs text-gray-500 leading-tight">{perk.description}</div>
+                    <div className="text-sm font-bold text-gray-900 mb-2 leading-snug">{perk.title}</div>
+                    <div className="text-sm text-gray-500 leading-snug">{perk.description}</div>
                   </div>
                 </StaggerItem>
               );
@@ -74,64 +76,65 @@ export default function CareersPage() {
         </div>
       </section>
 
-      <section className="py-20 bg-gray-50" id="positions">
+      <section className="py-24 bg-gray-50" id="positions">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeader
             tag="Now Hiring"
+            tagIcon={Briefcase}
             title="Open"
             titleHighlight="Positions"
             description={`We currently have ${activeJobs.length} open positions across engineering, sales, and internship programs.`}
-            className="mb-12"
+            className="mb-16"
           />
 
-          <div className="space-y-5">
+          <div className="space-y-8">
             {activeJobs.map((job, i) => (
               <AnimatedSection key={job.id} delay={0.05 * i}>
-                <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-md hover:border-primary-100 transition-all">
-                  <div className="p-7">
-                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-5">
+                <div className="bg-white rounded-3xl border border-gray-100 overflow-hidden hover:shadow-md hover:border-primary-100 transition-all">
+                  <div className="p-9">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6 mb-6">
                       <div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">{job.title}</h3>
-                        <div className="flex flex-wrap gap-2">
-                          <span className={cn('inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border', employmentColors[job.employmentType])}>
-                            <Briefcase size={12} />
+                        <h3 className="text-2xl font-bold text-gray-900 mb-3 font-heading">{job.title}</h3>
+                        <div className="flex flex-wrap gap-2.5">
+                          <span className={cn('inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold border', employmentColors[job.employmentType])}>
+                            <Briefcase size={13} />
                             {job.employmentType}
                           </span>
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 border border-gray-200">
-                            <MapPin size={12} />
+                          <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 border border-gray-200">
+                            <MapPin size={13} />
                             {job.location}
                           </span>
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 border border-gray-200">
-                            <Clock size={12} />
+                          <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 border border-gray-200">
+                            <Clock size={13} />
                             {job.department}
                           </span>
                         </div>
                       </div>
-                      <div className="text-xs text-gray-400 shrink-0">
+                      <div className="text-xs text-gray-400 shrink-0 font-semibold">
                         Posted {new Date(job.postedAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                       </div>
                     </div>
 
-                    <p className="text-gray-600 text-sm leading-relaxed mb-5">{job.shortDescription}</p>
+                    <p className="text-gray-650 text-base leading-relaxed mb-6">{job.shortDescription}</p>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-8">
                       <div>
-                        <div className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Key Responsibilities</div>
-                        <ul className="space-y-1.5">
+                        <div className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">Key Responsibilities</div>
+                        <ul className="space-y-2">
                           {job.responsibilities.slice(0, 3).map((r) => (
-                            <li key={r} className="flex items-start gap-2 text-xs text-gray-700">
-                              <span className="w-1.5 h-1.5 rounded-full bg-primary-500 mt-1.5 shrink-0" />
+                            <li key={r} className="flex items-start gap-2.5 text-sm text-gray-700">
+                              <span className="w-2 h-2 rounded-full bg-primary-500 mt-2 shrink-0" />
                               {r}
                             </li>
                           ))}
                         </ul>
                       </div>
                       <div>
-                        <div className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Requirements</div>
-                        <ul className="space-y-1.5">
+                        <div className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">Requirements</div>
+                        <ul className="space-y-2">
                           {job.requirements.slice(0, 3).map((r) => (
-                            <li key={r} className="flex items-start gap-2 text-xs text-gray-700">
-                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
+                            <li key={r} className="flex items-start gap-2.5 text-sm text-gray-700">
+                              <span className="w-2 h-2 rounded-full bg-emerald-500 mt-2 shrink-0" />
                               {r}
                             </li>
                           ))}
@@ -141,7 +144,7 @@ export default function CareersPage() {
 
                     <a
                       href="#apply"
-                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-800 text-white text-sm font-semibold rounded-lg hover:bg-primary-700 transition-colors"
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-primary-800 text-white text-base font-semibold rounded-xl hover:bg-primary-700 transition-colors shadow-sm"
                     >
                       Apply for this Role
                     </a>
@@ -153,16 +156,17 @@ export default function CareersPage() {
         </div>
       </section>
 
-      <section className="py-20 bg-white" id="apply">
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-24 bg-white" id="apply">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeader
             tag="Apply Now"
+            tagIcon={GraduationCap}
             title="Submit Your"
             titleHighlight="Application"
             description="Fill in the form below and our HR team will get back to you within 5 business days."
-            className="mb-10"
+            className="mb-12"
           />
-          <div className="bg-gray-50 rounded-2xl p-7 border border-gray-100">
+          <div className="bg-gray-50 rounded-3xl p-10 border border-gray-100 shadow-sm">
             <ApplicationForm />
           </div>
         </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { ShieldCheck, HardDrive, Network, Server, ArrowRight } from 'lucide-react';
+import { ShieldCheck, HardDrive, Network, Server, ArrowRight, Award } from 'lucide-react';
 import { SectionHeader } from '../ui/SectionHeader';
 import { StaggerContainer, StaggerItem } from '../ui/AnimatedSection';
 import Link from 'next/link';
@@ -51,55 +51,56 @@ const showcaseProjects = [
 
 export function ProjectShowcase() {
   return (
-    <section className="py-20 lg:py-28 bg-gray-50 border-t border-gray-150 overflow-hidden">
+    <section className="py-28 lg:py-36 bg-gray-50 border-t border-gray-150 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionHeader
-          tag="Our Deployments"
+          tag="Case Studies"
+          tagIcon={Award}
           title="Case Studies &"
           titleHighlight="Project Showcase"
           description="A visual look at the enterprise projects and hardware rollouts completed by CG Techno Electronics across Bengaluru."
-          className="mb-14"
+          className="mb-20"
         />
 
-        <StaggerContainer className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <StaggerContainer className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12">
           {showcaseProjects.map((project) => {
             const Icon = project.icon;
             return (
               <StaggerItem key={project.client}>
-                <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex flex-col justify-between h-full group hover:shadow-card-hover hover:border-gray-200 transition-all duration-300">
+                <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex flex-col justify-between h-full group hover:shadow-card-hover hover:border-gray-250 transition-all duration-300">
                   {/* Top Bar Banner */}
-                  <div className={`p-6 bg-gradient-to-r ${project.accent} text-white flex items-center justify-between`}>
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center font-bold text-sm">
+                  <div className={`p-8 bg-gradient-to-r ${project.accent} text-white flex items-center justify-between`}>
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center font-bold text-base shadow-inner">
                         {project.logoText}
                       </div>
                       <div>
-                        <h4 className="font-bold text-sm tracking-wide">{project.client}</h4>
-                        <p className="text-[10px] text-white/70 uppercase tracking-widest">{project.category}</p>
+                        <h4 className="font-bold text-base tracking-wide">{project.client}</h4>
+                        <p className="text-xs text-white/70 uppercase tracking-widest font-semibold">{project.category}</p>
                       </div>
                     </div>
-                    <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-white shrink-0">
-                      <Icon size={16} />
+                    <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white shrink-0">
+                      <Icon size={20} />
                     </div>
                   </div>
 
                   {/* Body Content */}
-                  <div className="p-8 flex-1 flex flex-col justify-between">
+                  <div className="p-10 flex-1 flex flex-col justify-between">
                     <div>
-                      <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-primary-800 transition-colors">
+                      <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-primary-800 transition-colors font-heading">
                         {project.title}
                       </h3>
-                      <p className="text-gray-600 text-sm leading-relaxed mb-6">
+                      <p className="text-gray-650 text-base leading-relaxed mb-8">
                         {project.description}
                       </p>
                     </div>
 
                     <div>
-                      <h5 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Key Outcomes</h5>
-                      <ul className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      <h5 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Key Outcomes</h5>
+                      <ul className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         {project.outcomes.map((out) => (
-                          <li key={out} className="bg-gray-50 border border-gray-100 rounded-lg p-3 text-center">
-                            <span className="text-[11px] font-bold text-gray-800 leading-tight block">
+                          <li key={out} className="bg-gray-50 border border-gray-100 rounded-xl p-4 text-center flex items-center justify-center h-full">
+                            <span className="text-xs font-bold text-gray-800 leading-snug">
                               {out}
                             </span>
                           </li>
@@ -109,14 +110,14 @@ export function ProjectShowcase() {
                   </div>
 
                   {/* Footer Link */}
-                  <div className="p-6 bg-gray-50/50 border-t border-gray-50 flex items-center justify-between">
-                    <span className="text-xs text-gray-500 font-semibold">Enterprise SLA Checked</span>
+                  <div className="p-8 bg-gray-50/50 border-t border-gray-50 flex items-center justify-between">
+                    <span className="text-sm text-gray-550 font-semibold">Enterprise SLA Checked</span>
                     <Link
                       href="/contact"
-                      className="inline-flex items-center gap-1.5 text-xs font-bold text-primary-800 hover:text-primary-700 transition-colors"
+                      className="inline-flex items-center gap-1.5 text-sm font-bold text-primary-800 hover:text-primary-700 transition-colors"
                     >
                       <span>Consult Similar Setup</span>
-                      <ArrowRight size={12} />
+                      <ArrowRight size={14} />
                     </Link>
                   </div>
                 </div>
@@ -124,6 +125,13 @@ export function ProjectShowcase() {
             );
           })}
         </StaggerContainer>
+
+        <div className="text-center mt-16">
+          <Link href="/contact" className="btn-primary inline-flex">
+            Discuss Your Project Setup
+            <ArrowRight size={16} />
+          </Link>
+        </div>
       </div>
     </section>
   );

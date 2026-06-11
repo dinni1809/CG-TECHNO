@@ -19,7 +19,7 @@ export const services: Service[] = [
       'End-to-end IT infrastructure setup, structured cabling, and hardware procurement for enterprises of all sizes.',
     longDescription:
       'We design, deploy, and maintain enterprise-grade IT infrastructure solutions. From structured network cabling to hardware procurement, our experts ensure your technology backbone is robust, scalable, and future-ready. We handle everything from initial assessment to full deployment and ongoing maintenance.',
-    icon: 'Server',
+    icon: 'Network',
     features: [
       'Structured network cabling (Cat5e/Cat6/Cat6A)',
       'Hardware procurement & installation',
@@ -31,7 +31,7 @@ export const services: Service[] = [
     ctaLabel: 'Request IT Audit',
     ctaHref: '/contact?service=it-infrastructure',
     color: 'text-blue-600',
-    gradient: 'from-blue-600 to-blue-800',
+    gradient: 'from-blue-800 to-indigo-950',
   },
   {
     id: 'cctv-surveillance',
@@ -52,7 +52,7 @@ export const services: Service[] = [
     ctaLabel: 'Get Security Assessment',
     ctaHref: '/contact?service=cctv-surveillance',
     color: 'text-emerald-600',
-    gradient: 'from-emerald-600 to-teal-700',
+    gradient: 'from-emerald-800 to-teal-950',
   },
   {
     id: 'server-solutions',
@@ -61,7 +61,7 @@ export const services: Service[] = [
       'Rack servers, blade servers, NAS/SAN storage, and virtualization solutions for modern data centers.',
     longDescription:
       'Harness the power of enterprise-grade servers and storage solutions. We supply, configure, and maintain rack-mount servers, blade systems, NAS/SAN storage arrays, and full virtualization environments using VMware, Hyper-V, and open-source platforms.',
-    icon: 'Database',
+    icon: 'Server',
     features: [
       'Rack and blade server deployment',
       'NAS/SAN storage configuration',
@@ -73,7 +73,7 @@ export const services: Service[] = [
     ctaLabel: 'Get Server Quote',
     ctaHref: '/contact?service=server-solutions',
     color: 'text-violet-600',
-    gradient: 'from-violet-600 to-purple-800',
+    gradient: 'from-violet-800 to-purple-950',
   },
   {
     id: 'e-waste',
@@ -94,7 +94,7 @@ export const services: Service[] = [
     ctaLabel: 'Schedule Pickup',
     ctaHref: '/contact?service=e-waste',
     color: 'text-green-600',
-    gradient: 'from-green-600 to-emerald-700',
+    gradient: 'from-emerald-800 to-green-950',
   },
   {
     id: 'distribution',
@@ -115,7 +115,7 @@ export const services: Service[] = [
     ctaLabel: 'Request Catalogue',
     ctaHref: '/contact?service=distribution',
     color: 'text-orange-600',
-    gradient: 'from-orange-500 to-red-600',
+    gradient: 'from-orange-700 to-red-950',
   },
   {
     id: 'rental-lease',
@@ -124,7 +124,7 @@ export const services: Service[] = [
       'Flexible short and long-term rental of laptops, desktops, servers, and networking equipment for any duration.',
     longDescription:
       'Minimize capital expenditure without sacrificing technology quality. Our rental and leasing programs provide access to the latest hardware for events, projects, temporary offices, or long-term business needs — with full maintenance and replacement guarantees.',
-    icon: 'MonitorSmartphone',
+    icon: 'Laptop',
     features: [
       'Laptop and desktop rental',
       'Server and networking equipment rental',
@@ -136,6 +136,6 @@ export const services: Service[] = [
     ctaLabel: 'Get Rental Quote',
     ctaHref: '/contact?service=rental-lease',
     color: 'text-cyan-600',
-    gradient: 'from-cyan-600 to-blue-700',
+    gradient: 'from-cyan-800 to-blue-950',
   },
 ];
