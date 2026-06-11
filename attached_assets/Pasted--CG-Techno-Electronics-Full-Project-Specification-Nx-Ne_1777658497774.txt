@@ -1,0 +1,289 @@
+# CG Techno Electronics — Full Project Specification (Nx + Next.js + Animations)
+
+---
+
+## 0. OBJECTIVE
+
+Build a **premium, modern, animated corporate website** for:
+
+**CG Techno Electronics (Bengaluru)**
+
+The website must:
+
+* Look like a **high-end IT company**
+* Be **interactive and animated (NOT static)**
+* Showcase services, products, and clients
+* Capture enquiries & job applications
+* Send all submissions to:
+  **[cgtechnoelectronics@gmail.com](mailto:cgtechnoelectronics@gmail.com)**
+* Be fast, responsive, and deployable on Vercel
+
+---
+
+## 1. TECH STACK
+
+* Nx Monorepo
+* Next.js (App Router)
+* TypeScript
+* Tailwind CSS
+* Framer Motion (MANDATORY for animations)
+* React Hook Form + Zod
+* Nodemailer (email)
+* Vercel deployment
+
+---
+
+## 2. NX STRUCTURE
+
+/apps/web
+/libs/ui
+/libs/sections
+/libs/features
+/libs/utils
+/libs/config
+
+---
+
+## 3. DESIGN SYSTEM
+
+* Primary: #1E3A8A (Deep Blue)
+* Accent: #3B82F6
+* Background: White + Dark
+* Fonts: Inter + Space Grotesk
+
+---
+
+## 4. ANIMATION SYSTEM (VERY IMPORTANT)
+
+The website MUST NOT feel static.
+
+Use **Framer Motion everywhere strategically**.
+
+---
+
+### GLOBAL RULES
+
+* All sections animate on scroll (fade + slide up)
+* Duration: 0.6–0.8s
+* Use `whileInView`
+* Use `viewport={{ once: true }}`
+
+---
+
+### HERO SECTION
+
+* Text fades in + slides up
+* Buttons scale on hover
+* Background gradient animation (slow)
+
+---
+
+### SERVICES / PRODUCT CARDS
+
+* Hover:
+
+  * lift (translateY)
+  * shadow increase
+  * slight scale (1.02–1.05)
+
+---
+
+### NAVBAR
+
+* Sticky on scroll
+* Background blur (`backdrop-blur-md`)
+* Smooth transition
+
+---
+
+### SCROLL REVEAL
+
+Example behavior:
+
+* Section appears when scrolled into view
+* Fade + upward motion
+
+---
+
+### STATS SECTION
+
+* Animated counters (count from 0)
+* Smooth increment effect
+
+---
+
+### BUTTONS
+
+* Hover scale
+* Color transition
+* Optional glow
+
+---
+
+### PAGE TRANSITIONS
+
+* Fade transition between pages
+* No abrupt changes
+
+---
+
+### MICRO INTERACTIONS
+
+* Links underline on hover
+* Cards slightly tilt or move
+* Smooth easing
+
+---
+
+## 5. UI REQUIREMENTS
+
+---
+
+### HOMEPAGE
+
+Sections:
+
+1. Hero (animated)
+2. About
+3. Services (interactive cards)
+4. Solutions (zig-zag layout)
+5. Products (clean cards)
+6. Stats (animated)
+7. Clients
+8. Testimonials
+9. CTA
+
+---
+
+### OTHER PAGES
+
+* About
+* Services
+* Products
+* Clients
+* Careers (with form)
+* Contact (with form)
+
+---
+
+## 6. FORMS (FUNCTIONALITY)
+
+---
+
+### CONTACT FORM
+
+Fields:
+
+* name
+* email
+* phone
+* message
+
+---
+
+### CAREERS FORM
+
+Fields:
+
+* name
+* email
+* phone
+* role
+* message
+
+---
+
+## 7. EMAIL SYSTEM (MANDATORY)
+
+All submissions must go to:
+
+```text
+cgtechnoelectronics@gmail.com
+```
+
+---
+
+### ENV VARIABLES
+
+```bash
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=cgtechnoelectronics@gmail.com
+SMTP_PASSWORD=APP_PASSWORD
+
+CONTACT_EMAIL_TO=cgtechnoelectronics@gmail.com
+CAREERS_EMAIL_TO=cgtechnoelectronics@gmail.com
+```
+
+---
+
+### FLOW
+
+User → Submit form
+→ API route
+→ Nodemailer
+→ Email sent
+→ Success response
+
+---
+
+## 8. API ROUTES
+
+POST /api/contact
+POST /api/apply
+
+* Validate input
+* Send email
+* Return JSON
+
+---
+
+## 9. PERFORMANCE
+
+* Fast load (<2s)
+* Lazy loading images
+* Optimized assets
+
+---
+
+## 10. SEO
+
+* Meta tags
+* Titles
+* Structured data
+* Sitemap
+
+---
+
+## 11. DEPLOYMENT
+
+* GitHub → Vercel
+* Add environment variables
+* Deploy
+
+---
+
+## 12. ACCEPTANCE CRITERIA
+
+* Smooth animations everywhere
+* No static feel
+* Forms working
+* Emails received at:
+  [cgtechnoelectronics@gmail.com](mailto:cgtechnoelectronics@gmail.com)
+* Mobile responsive
+* Clean UI
+
+---
+
+## 13. FINAL EXPECTATION
+
+The website must look like:
+
+* A real IT company
+* Premium and modern
+* Interactive and smooth
+* Not basic or static
+
+---
+
+END OF SPEC

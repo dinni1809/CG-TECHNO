@@ -1,0 +1,35 @@
+{
+  "name": "@cg-techno/web",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@cg-techno/config": "workspace:*",
+    "@cg-techno/features": "workspace:*",
+    "@cg-techno/utils": "workspace:*",
+    "clsx": "catalog:",
+    "framer-motion": "catalog:",
+    "lucide-react": "catalog:",
+    "next": "^14.2.29",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "react-hook-form": "^7.56.4",
+    "tailwind-merge": "catalog:",
+    "zod": "catalog:",
+    "@hookform/resolvers": "^3.10.0"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.17",
+    "typescript": "~5.9.2"
+  }
+}

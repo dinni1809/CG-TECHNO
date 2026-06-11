@@ -1,0 +1,299 @@
+# Requirements.md
+# CG Techno Electronics — Corporate Website
+# Version: 1.0.0 | Status: Production-Ready Specification
+
+---
+
+## 1. Project Overview
+
+**Company:** CG Techno Electronics
+**Location:** Bengaluru, Karnataka, India
+**Project Type:** Corporate IT Infrastructure & Electronics Solutions Website
+**Architecture:** Nx Monorepo — Next.js (App Router) + Serverless APIs
+**Deployment Target:** Vercel
+
+This document defines the complete functional, non-functional, and technical requirements
+for the CG Techno Electronics corporate website. The system is designed as a static-first,
+SEO-optimized, premium web presence capable of capturing customer enquiries and talent
+applications via serverless API routes.
+
+---
+
+## 2. Stakeholders
+
+| Role                  | Responsibility                                      |
+|------------------------|-----------------------------------------------------|
+| Business Owner         | Final approval on content, branding, and UX flow   |
+| Frontend Developer     | UI implementation, component architecture          |
+| Backend Developer      | API routes, email integration, validation          |
+| DevOps / Infra         | Vercel deployment, environment management          |
+| Content Manager        | Pages content, product listings, service copy      |
+
+---
+
+## 3. Functional Requirements
+
+### 3.1 Website Pages
+
+The website shall contain the following pages:
+
+| Page         | Route          | Description                                            |
+|--------------|----------------|--------------------------------------------------------|
+| Home         | /              | Hero, stats, services overview, clients, CTA           |
+| About        | /about         | Company profile, mission, vision, leadership           |
+| Services     | /services      | Full services listing with detail cards                |
+| Products     | /products      | Product showcase with enquiry CTA (no pricing/cart)    |
+| Clients      | /clients       | Client logos, testimonials, engagement metrics         |
+| Careers      | /careers       | Open roles, internship listings, application form      |
+| Contact      | /contact       | Enquiry form, office location, contact details         |
+
+---
+
+### 3.2 Services to Showcase
+
+The website must prominently display the following six service categories:
+
+1. **IT Infrastructure**
+   - Network setup, cabling, structured wiring
+   - Hardware procurement and installation
+
+2. **CCTV & Surveillance**
+   - IP cameras, DVR/NVR solutions
+   - Remote monitoring integration
+
+3. **Server Solutions**
+   - Rack servers, blade servers, NAS/SAN
+   - Virtualization and data center setup
+
+4. **E-Waste Management**
+   - Certified disposal and recycling
+   - Corporate e-waste pickup programs
+
+5. **Product Distribution**
+   - Authorized distribution of IT hardware brands
+   - Bulk procurement for enterprises
+
+6. **Rental / Lease Solutions**
+   - Short and long-term hardware rental
+   - Laptops, desktops, servers, networking gear
+
+---
+
+### 3.3 Products Showcase
+
+- Display product categories: RAM, CCTV cameras, servers, switches, UPS, cables
+- No pricing displayed
+- No shopping cart or checkout flow
+- Each product card must include: Name, Image, Short Description, Enquiry CTA button
+- Enquiry CTA links to Contact page or opens enquiry modal
+
+---
+
+### 3.4 Careers / Application System
+
+**Application Form Fields:**
+
+| Field    | Type     | Validation                          |
+|----------|----------|-------------------------------------|
+| name     | string   | Required, 2–100 characters          |
+| email    | string   | Required, valid email format        |
+| phone    | string   | Required, 10-digit Indian mobile    |
+| role     | string   | Required, selected from dropdown    |
+| message  | string   | Optional, max 1000 characters       |
+
+**Available Roles (Dropdown):**
+- IT Support Engineer
+- Network Administrator
+- Sales Executive
+- Business Development Manager
+- Intern — IT
+- Intern — Sales & Marketing
+
+**On Submission:**
+- Client-side validation runs first
+- POST to `/api/apply`
+- Success: Show confirmation toast/message
+- Error: Display error with retry option
+
+---
+
+### 3.5 Contact / Enquiry System
+
+**Enquiry Form Fields:**
+
+| Field    | Type     | Validation                          |
+|----------|----------|-------------------------------------|
+| name     | string   | Required, 2–100 characters          |
+| email    | string   | Required, valid email format        |
+| phone    | string   | Required, 10-digit Indian mobile    |
+| message  | string   | Required, max 1000 characters       |
+
+**On Submission:**
+- POST to `/api/contact`
+- Email dispatched to company inbox via Nodemailer
+- User receives in-browser confirmation
+
+---
+
+## 4. Non-Functional Requirements
+
+### 4.1 Performance
+
+- Lighthouse Performance Score: ≥ 90
+- First Contentful Paint (FCP): < 1.5s
+- Largest Contentful Paint (LCP): < 2.5s
+- Cumulative Layout Shift (CLS): < 0.1
+- Time to Interactive (TTI): < 3.5s
+- All images must use Next.js `<Image>` with lazy loading and WebP format
+
+### 4.2 SEO
+
+- Meta title and description on every page
+- Open Graph and Twitter Card tags
+- Canonical URLs
+- Structured data (JSON-LD) for Organization and LocalBusiness
+- Sitemap.xml auto-generated via next-sitemap
+- Robots.txt configured
+- Semantic HTML5 throughout
+
+### 4.3 Accessibility
+
+- WCAG 2.1 AA compliance
+- Keyboard navigation support
+- ARIA labels on all interactive elements
+- Sufficient color contrast ratios
+- Focus management on modals and forms
+
+### 4.4 Security
+
+- Environment variables for all secrets (SMTP credentials)
+- API input sanitization before email dispatch
+- Rate limiting on API routes (max 10 requests per IP per minute)
+- CORS headers configured for API routes
+- No sensitive data exposed on client-side
+
+### 4.5 Scalability
+
+- Nx modular library architecture enables independent library versioning
+- New pages can be added without touching existing lib structure
+- Services and products are data-driven (content arrays), not hardcoded
+
+### 4.6 Maintainability
+
+- TypeScript throughout (strict mode)
+- ESLint + Prettier enforced
+- Husky pre-commit hooks
+- All components documented with JSDoc comments
+- Folder structure enforced by Nx project boundaries
+
+### 4.7 Responsiveness
+
+- Mobile-first design
+- Breakpoints: 320px / 640px / 768px / 1024px / 1280px / 1536px
+- Tested on Chrome, Safari, Firefox, Edge
+- Tested on iOS Safari and Android Chrome
+
+---
+
+## 5. Technology Requirements
+
+| Layer              | Technology                         |
+|--------------------|-------------------------------------|
+| Monorepo           | Nx 18+                              |
+| Frontend Framework | Next.js 14+ (App Router)            |
+| Language           | TypeScript 5+                       |
+| Styling            | Tailwind CSS 3+                     |
+| Animations         | Framer Motion 11+                   |
+| Form Handling      | React Hook Form + Zod               |
+| Email Service      | Nodemailer (SMTP)                   |
+| Icons              | Lucide React                        |
+| Linting            | ESLint + Prettier                   |
+| Testing            | Jest + React Testing Library        |
+| Deployment         | Vercel                              |
+| Version Control    | Git + GitHub                        |
+
+---
+
+## 6. UI/UX Requirements
+
+### 6.1 Design System
+
+- **Primary Color:** Deep Blue (#1E3A8A) — trust, technology
+- **Accent Color:** Electric Blue (#3B82F6) — modernity
+- **Background:** Off-white (#F8FAFC) / Dark (#0F172A)
+- **Typography:** Inter (body), Space Grotesk (headings)
+- **Border Radius:** 12px (cards), 8px (buttons), 999px (pills/badges)
+- **Shadow System:** sm / md / lg / xl — consistent elevation model
+
+### 6.2 Mandatory UI Components
+
+- Sticky Navbar with backdrop blur on scroll
+- Hero section: full-viewport, gradient background, animated headline
+- Animated statistics counters (IntersectionObserver triggered)
+- Service cards with hover scale + shadow lift
+- Product cards with category badges and enquiry CTA
+- Client logo marquee/carousel
+- Testimonial section with quote cards
+- Scroll-triggered fade/slide animations (Framer Motion)
+- Toast notification system for form feedback
+- Fully accessible modal for product enquiry
+- Footer with sitemap links, social icons, company address
+
+### 6.3 Navigation Structure
+
+```
+[Logo]  Home  About  Services  Products  Clients  Careers  Contact  [Enquire Now CTA]
+```
+
+Mobile: Hamburger menu with slide-in drawer
+
+---
+
+## 7. Content Requirements
+
+### 7.1 Homepage Sections (in order)
+
+1. Navbar
+2. Hero — tagline, subtext, CTA buttons, animated visual
+3. Stats — Years of Experience, Clients Served, Projects Completed, Cities
+4. Services Overview — 6 service cards
+5. About Snapshot — brief company intro with "Read More" link
+6. Products Preview — featured product grid
+7. Clients — logo strip / marquee
+8. Testimonials — client quotes
+9. CTA Banner — "Get a Free Consultation"
+10. Footer
+
+### 7.2 Static Content Sources
+
+All content (services, products, testimonials, clients) stored as TypeScript data arrays
+inside `libs/config/src/data/` — no CMS required for v1.
+
+---
+
+## 8. Out of Scope (v1)
+
+- E-commerce / Payment gateway
+- Admin dashboard or CMS
+- User authentication / accounts
+- Live chat integration
+- Blog / News section
+- Multi-language support
+- WhatsApp Business API integration
+
+*Above features are planned for v2 and beyond.*
+
+---
+
+## 9. Assumptions & Constraints
+
+- Company will provide logo, brand assets, and content copy before Phase 3
+- SMTP credentials (Gmail App Password or SendGrid) provided before Phase 5
+- No database is required; all submissions handled via email dispatch
+- Vercel free tier sufficient for v1 traffic volumes
+- Google Analytics 4 tracking to be added post-launch
+
+---
+
+*Document Owner: Engineering Team — CG Techno Electronics*
+*Last Updated: 2025*

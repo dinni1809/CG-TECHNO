@@ -1,0 +1,19 @@
+{
+  "name": "@cg-techno/features",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./schemas": "./src/schemas/index.ts",
+    "./email": "./src/email/index.ts"
+  },
+  "dependencies": {
+    "@cg-techno/utils": "workspace:*",
+    "nodemailer": "^6.9.16",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/nodemailer": "^6.4.17"
+  }
+}

@@ -1,0 +1,25 @@
+kind = "web"
+previewPath = "/"
+title = "CG Techno Electronics"
+version = "1.0.0"
+id = "artifacts/cg-techno-web"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 3000
+
+[services.development]
+run = "pnpm --filter @cg-techno/web run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@cg-techno/web", "run", "build" ]
+run = [ "pnpm", "--filter", "@cg-techno/web", "run", "start" ]
+
+[services.env]
+PORT = "3000"

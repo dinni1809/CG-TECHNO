@@ -1,0 +1,589 @@
+# Phases.md
+# CG Techno Electronics — Development Sprint Plan
+# Version: 1.0.0 | Methodology: Agile Sprint Cycles
+
+---
+
+## 1. Overview
+
+This document defines the complete development lifecycle for the CG Techno Electronics
+corporate website, organized into **7 focused sprints**. Each sprint has defined
+deliverables, acceptance criteria, and technical tasks. Sprints are estimated at
+**1 week each**, with a total projected timeline of **7 weeks to production**.
+
+**Total Duration:** 7 Weeks
+**Team Size:** 1–2 Developers
+**Methodology:** Agile (sprint-based, iterative delivery)
+
+---
+
+## 2. Sprint Timeline Summary
+
+| Sprint | Focus Area                          | Duration | Status     |
+|--------|-------------------------------------|----------|------------|
+| 1      | Nx Setup & Foundation               | Week 1   | Planning   |
+| 2      | UI Component Library (libs/ui)      | Week 2   | Planning   |
+| 3      | Homepage & Core Sections            | Week 3   | Planning   |
+| 4      | Inner Pages (Services, Products...) | Week 4   | Planning   |
+| 5      | API Routes & Email Integration      | Week 5   | Planning   |
+| 6      | Animations, Polish & QA             | Week 6   | Planning   |
+| 7      | Deployment, SEO & Launch            | Week 7   | Planning   |
+
+---
+
+## 3. Sprint 1 — Nx Foundation & Project Setup
+
+**Duration:** Week 1 (Days 1–5)
+**Goal:** Establish the Nx monorepo, configure tooling, and scaffold the complete
+folder structure before any feature development begins.
+
+---
+
+### 3.1 Deliverables
+
+- Nx monorepo initialized with all library projects
+- Next.js application configured with App Router
+- Tailwind CSS configured globally
+- TypeScript strict mode enforced
+- ESLint + Prettier configured
+- Husky pre-commit hooks active
+- Environment variable template in place
+- Git repository initialized with branching strategy
+
+---
+
+### 3.2 Tasks
+
+#### Day 1 — Nx Workspace Init
+```bash
+# Initialize Nx workspace
+npx create-nx-workspace@latest cg-techno-electronics \
+  --preset=next \
+  --appName=web \
+  --style=tailwind \
+  --nxCloud=false
+
+cd cg-techno-electronics
+```
+
+#### Day 2 — Library Scaffolding
+```bash
+# Generate all Nx libraries
+nx g @nx/react:library ui --bundler=vite --unitTestRunner=jest
+nx g @nx/react:library sections --bundler=vite --unitTestRunner=jest
+nx g @nx/react:library features --bundler=vite --unitTestRunner=jest
+nx g @nx/js:library utils --bundler=tsc --unitTestRunner=jest
+nx g @nx/js:library config --bundler=tsc --unitTestRunner=jest
+```
+
+#### Day 3 — Tooling Configuration
+- Configure `tsconfig.base.json` with path aliases for all libs
+- Set up `@cg-techno/ui`, `@cg-techno/sections`, `@cg-techno/features`,
+  `@cg-techno/utils`, `@cg-techno/config` path mappings
+- Configure ESLint with Next.js + TypeScript rules
+- Configure Prettier rules (single quotes, semi: true, tabWidth: 2)
+- Set up Husky + lint-staged for pre-commit validation
+
+#### Day 4 — Next.js App Router Setup
+- Configure `apps/web/next.config.js`
+- Create root layout: `apps/web/app/layout.tsx`
+- Create placeholder page files for all routes:
+  `/`, `/about`, `/services`, `/products`, `/clients`, `/careers`, `/contact`
+- Configure `not-found.tsx` and `error.tsx`
+
+#### Day 5 — Environment & Dependencies
+- Install all required packages:
+  ```bash
+  npm install framer-motion react-hook-form zod @hookform/resolvers
+  npm install nodemailer lucide-react clsx tailwind-merge sanitize-html
+  npm install -D @types/nodemailer @types/sanitize-html
+  ```
+- Create `.env.local.example` with all required variables
+- Verify `nx graph` shows correct project dependencies
+- Create `README.md` stub
+
+---
+
+### 3.3 Acceptance Criteria
+
+- [ ] `nx serve web` runs without errors on `localhost:3000`
+- [ ] All 5 library projects exist in `libs/`
+- [ ] TypeScript path aliases resolve correctly
+- [ ] ESLint passes on all files with zero errors
+- [ ] Husky blocks commits with lint errors
+- [ ] Git history is clean with meaningful commit messages
+
+---
+
+## 4. Sprint 2 — UI Component Library
+
+**Duration:** Week 2 (Days 6–10)
+**Goal:** Build the complete reusable component library in `libs/ui`. All components
+must be accessible, typed, and tested before use in any section or page.
+
+---
+
+### 4.1 Deliverables
+
+- Complete `libs/ui` component library with barrel exports
+- All primitive components built, typed, and unit tested
+- Tailwind design tokens documented in a `tokens.ts` file
+
+---
+
+### 4.2 Components to Build
+
+| Component    | Description                                               | Priority |
+|--------------|-----------------------------------------------------------|----------|
+| Button       | Primary, secondary, outline, ghost variants               | P0       |
+| Card         | Base card with shadow, border, hover support              | P0       |
+| Input        | Text input with label, error state, helper text           | P0       |
+| Textarea     | Multi-line input with char count, error state             | P0       |
+| Select       | Accessible dropdown with option list                      | P0       |
+| Badge        | Category/status pill badges                               | P0       |
+| Navbar       | Sticky header with blur-on-scroll, mobile hamburger       | P0       |
+| Footer       | Multi-column footer with links, social icons, address     | P0       |
+| Modal        | Accessible dialog with focus trap, keyboard close         | P1       |
+| Toast        | Success/error notification with auto-dismiss              | P1       |
+| Spinner      | Loading indicator (ring animation)                        | P1       |
+
+---
+
+### 4.3 Tasks
+
+#### Day 6 — Button, Badge, Spinner
+```typescript
+// Example: Button component signature
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
+  size?: 'sm' | 'md' | 'lg';
+  isLoading?: boolean;
+  leftIcon?: React.ReactNode;
+}
+```
+
+#### Day 7 — Input, Textarea, Select
+- Build with forwardRef for React Hook Form compatibility
+- Integrate error state display with ARIA `aria-invalid` and `aria-describedby`
+- All inputs accept standard HTML attributes via spread
+
+#### Day 8 — Card, Navbar
+- Card with optional header, body, footer slots
+- Navbar: desktop horizontal links + mobile hamburger drawer
+- useScrollPosition hook for blur effect activation
+
+#### Day 9 — Footer, Modal
+- Footer: 4-column grid (Company, Services, Quick Links, Contact)
+- Modal: portal-rendered, focus trap via `focus-trap-react` or native `inert`
+
+#### Day 10 — Toast, Tests, Barrel Exports
+- ToastContext + useToast hook
+- Toast queue with stacking support
+- Unit tests for Button, Input, Select using React Testing Library
+- Update `libs/ui/src/index.ts` barrel export for all components
+
+---
+
+### 4.4 Acceptance Criteria
+
+- [ ] All components render correctly in isolation
+- [ ] Button variants all render with correct Tailwind classes
+- [ ] Input, Textarea, Select display error states correctly
+- [ ] Navbar collapses to hamburger at 768px breakpoint
+- [ ] Modal traps focus and closes on Escape key
+- [ ] Toast auto-dismisses after 4 seconds
+- [ ] All components pass unit tests
+- [ ] Zero TypeScript errors in strict mode
+
+---
+
+## 5. Sprint 3 — Homepage & Core Sections
+
+**Duration:** Week 3 (Days 11–15)
+**Goal:** Build the complete homepage using `libs/sections`. All homepage sections
+must be animated and pixel-perfect on all breakpoints.
+
+---
+
+### 5.1 Deliverables
+
+- Fully animated homepage at `/`
+- All 10 homepage sections implemented in `libs/sections`
+- Framer Motion animations wired to scroll triggers
+
+---
+
+### 5.2 Sections to Build (in order)
+
+| Section        | Key Features                                              |
+|----------------|-----------------------------------------------------------|
+| Hero           | Full-viewport, gradient BG, animated headline, dual CTA  |
+| Stats          | Animated counters (clients, projects, experience, cities) |
+| Services       | 6 service cards, hover effects, CTA per card             |
+| About Snapshot | Left-right split layout, image, stats, "Read More" CTA   |
+| Products       | Featured product grid (4–6 items), enquiry CTA           |
+| Clients        | Infinite logo marquee, autoplay, pause on hover          |
+| Testimonials   | Card carousel or 3-column grid with star ratings         |
+| CTA Banner     | Full-width gradient, "Get a Free Consultation" CTA       |
+
+---
+
+### 5.3 Tasks
+
+#### Day 11 — Hero + Stats
+- Hero: `motion.div` with stagger animation on headline, subtext, CTA
+- Gradient background with subtle animated mesh (CSS or SVG)
+- Stats: `useInView` + counter animation from 0 to target value
+
+#### Day 12 — Services Section
+- 6 service cards in a responsive 3-column grid
+- Card: icon, title, description, CTA button
+- Framer Motion `whileHover`: scale 1.03, shadow lift
+
+#### Day 13 — About Snapshot + Products Preview
+- About: image left, content right (responsive stack on mobile)
+- Products: filtered to "featured: true" items from config data
+
+#### Day 14 — Clients Marquee + Testimonials
+- Client logos: CSS `animation: scroll` or Framer Motion x-axis continuous loop
+- Testimonials: 3-column grid, each card with quote, avatar, rating stars
+
+#### Day 15 — CTA Banner + Assembly
+- Full-width CTA section with gradient
+- Assemble all sections in `apps/web/app/page.tsx`
+- Full responsive QA on mobile (375px), tablet (768px), desktop (1440px)
+
+---
+
+### 5.4 Acceptance Criteria
+
+- [ ] Hero loads within 1.5s (Lighthouse FCP)
+- [ ] All counter animations trigger on scroll into view
+- [ ] Service cards show hover scale + shadow effect
+- [ ] Client logo marquee scrolls infinitely without gap
+- [ ] Homepage is visually complete on 375px, 768px, 1440px
+- [ ] No horizontal scroll on any breakpoint
+- [ ] All CTA buttons link to correct routes
+
+---
+
+## 6. Sprint 4 — Inner Pages
+
+**Duration:** Week 4 (Days 16–20)
+**Goal:** Build all inner pages: About, Services, Products, Clients, Careers, Contact.
+Each page must be fully static (SSG) and visually consistent with the homepage.
+
+---
+
+### 6.1 Pages to Build
+
+| Page     | Route      | Key Sections                                              |
+|----------|------------|-----------------------------------------------------------|
+| About    | /about     | Story, Mission/Vision, Values, Team, Certifications       |
+| Services | /services  | Detailed 6-service listing with expanded descriptions     |
+| Products | /products  | Filterable product grid with category tabs                |
+| Clients  | /clients   | Logo grid, industry badges, testimonials, metrics         |
+| Careers  | /careers   | Culture section, open positions list, application form    |
+| Contact  | /contact   | Enquiry form, map embed, phone/email/address              |
+
+---
+
+### 6.2 Tasks
+
+#### Day 16 — About + Clients Pages
+- About: narrative copy blocks, mission/vision cards, 4-icon value grid
+- Clients: logo grid with `industry` filter badges (Government, IT, Healthcare, etc.)
+
+#### Day 17 — Services Page
+- Full service detail cards (expand beyond homepage overview)
+- Each service: icon, title, long description, feature bullet list, CTA
+- Anchor link navigation (#it-infrastructure, #cctv, etc.)
+
+#### Day 18 — Products Page
+- Category filter tabs: All | Networking | Servers | CCTV | UPS | Accessories
+- Client-side filter with `useState` — no API calls
+- Each product card: image, name, category badge, short description, "Enquire" button
+- Enquiry button → `/contact?product=<id>` or opens enquiry modal
+
+#### Day 19 — Careers Page
+- Company culture/perks section (icons + brief descriptions)
+- Open positions list rendered from `careers.data.ts`
+- `ApplicationForm` component from `libs/features` wired below positions
+- Role dropdown pre-populated from `AVAILABLE_ROLES` enum
+
+#### Day 20 — Contact Page
+- `ContactForm` component from `libs/features`
+- Google Maps embed (or static map image for v1)
+- Contact info block: phone, email, address, business hours
+- Query param pre-fill: read `?service=` or `?product=` from URL on mount
+
+---
+
+### 6.3 Acceptance Criteria
+
+- [ ] All 6 pages load as static HTML (verify via view-source)
+- [ ] Products category filter works correctly client-side
+- [ ] Careers page renders all active job openings from data file
+- [ ] Contact form pre-fills correctly from URL query parameters
+- [ ] All pages have correct `<title>` and `<meta description>` tags
+- [ ] All pages are fully responsive (375px → 1440px)
+
+---
+
+## 7. Sprint 5 — API Routes & Email Integration
+
+**Duration:** Week 5 (Days 21–25)
+**Goal:** Implement both serverless API routes, connect Nodemailer SMTP, wire frontend
+forms to API endpoints, and verify end-to-end email delivery in staging.
+
+---
+
+### 7.1 Deliverables
+
+- `POST /api/contact` fully functional with email delivery
+- `POST /api/apply` fully functional with email delivery
+- Forms wired with real-time validation and API state handling
+- Rate limiting active on both endpoints
+- Environment variables documented and configured on Vercel
+
+---
+
+### 7.2 Tasks
+
+#### Day 21 — Nodemailer Setup
+- Implement `libs/features/src/email/mailer.ts`
+- Configure Gmail SMTP transport (App Password)
+- Test `transporter.verify()` in isolation
+- Build HTML email template for contact enquiry
+- Build HTML email template for job application
+
+#### Day 22 — /api/contact Route
+- Implement `apps/web/app/api/contact/route.ts`
+- Integrate rate limiting, Zod validation, email dispatch
+- Test with cURL for success, validation error, and rate limit scenarios
+
+#### Day 23 — /api/apply Route
+- Implement `apps/web/app/api/apply/route.ts`
+- Mirror pattern from contact route with ApplicationSchema
+- Test with cURL for all scenarios
+
+#### Day 24 — Frontend Form Wiring
+- Wire `ContactForm` to `POST /api/contact` using fetch()
+- Wire `ApplicationForm` to `POST /api/apply` using fetch()
+- Handle all response states: loading spinner, success toast, error toast
+- Disable submit button during pending state
+- Reset form on success
+
+#### Day 25 — End-to-End Testing & Staging Deploy
+- Deploy to Vercel staging branch
+- Set environment variables in Vercel dashboard
+- Submit real test enquiry → verify email arrives in company inbox
+- Submit real test application → verify email arrives in HR inbox
+- Test rate limiting by exceeding 10 requests per minute
+
+---
+
+### 7.3 Acceptance Criteria
+
+- [ ] Contact form submission delivers formatted email to company inbox
+- [ ] Application form submission delivers formatted email to HR inbox
+- [ ] Validation errors display inline per field on client
+- [ ] API returns correct HTTP status codes (200, 400, 429, 500)
+- [ ] Submit button shows loading state during request
+- [ ] Success toast appears after confirmed delivery
+- [ ] Error toast appears with actionable message on failure
+- [ ] Rate limiter blocks after 10 requests from same IP in 60 seconds
+
+---
+
+## 8. Sprint 6 — Animations, Polish & QA
+
+**Duration:** Week 6 (Days 26–30)
+**Goal:** Finalize all animations, conduct full cross-browser and device QA,
+fix visual inconsistencies, and hit Lighthouse performance targets.
+
+---
+
+### 8.1 Deliverables
+
+- All scroll-triggered animations implemented and tuned
+- Full cross-browser QA pass
+- Lighthouse scores ≥ 90 on Performance, Accessibility, Best Practices, SEO
+- Zero console errors in production build
+
+---
+
+### 8.2 Animation Checklist
+
+| Animation                    | Trigger          | Library          |
+|------------------------------|------------------|------------------|
+| Hero headline stagger         | Page load        | Framer Motion    |
+| Section fade-slide in         | Scroll into view | Framer Motion    |
+| Stats counter 0 → value       | Scroll into view | Framer Motion    |
+| Service card hover scale      | Mouse hover      | Framer Motion    |
+| Product card hover lift       | Mouse hover      | Framer Motion    |
+| Client logo marquee scroll    | Always           | CSS animation    |
+| Navbar blur on scroll         | Window scroll    | CSS + useEffect  |
+| Mobile menu slide-in drawer   | Button click     | Framer Motion    |
+| Toast slide-in / fade-out     | API response     | Framer Motion    |
+| Button ripple on click        | Mouse click      | CSS              |
+
+---
+
+### 8.3 QA Checklist
+
+#### Browser Testing
+- [ ] Chrome 120+ (macOS, Windows)
+- [ ] Safari 17+ (macOS, iOS)
+- [ ] Firefox 121+ (macOS, Windows)
+- [ ] Edge 120+ (Windows)
+- [ ] Samsung Internet (Android)
+
+#### Device Testing
+- [ ] iPhone SE (375px)
+- [ ] iPhone 14 Pro (390px)
+- [ ] iPad (768px)
+- [ ] Desktop HD (1440px)
+- [ ] Desktop 4K (2560px)
+
+#### Functional QA
+- [ ] All navigation links resolve correctly
+- [ ] External links open in new tab
+- [ ] All forms submit and receive responses
+- [ ] All form error states display correctly
+- [ ] 404 page shows for invalid routes
+- [ ] Error boundary catches unhandled errors
+
+#### Accessibility QA
+- [ ] Keyboard-only navigation through all pages
+- [ ] Screen reader test (VoiceOver / NVDA)
+- [ ] Color contrast ratio ≥ 4.5:1 for all text
+- [ ] All images have meaningful alt text
+- [ ] Form inputs have associated labels
+
+---
+
+### 8.4 Performance Optimization Tasks
+
+- Run `next/bundle-analyzer` and eliminate heavy imports
+- Audit all images: convert to WebP, add width/height, use `priority` on hero
+- Audit all fonts: ensure `next/font` preloads only needed weights
+- Add `loading="lazy"` to below-fold images
+- Run Lighthouse in Chrome DevTools for all pages
+- Target and resolve any CLS shifts in layout
+
+---
+
+### 8.5 Acceptance Criteria
+
+- [ ] Lighthouse Performance ≥ 90 on homepage
+- [ ] Lighthouse Accessibility ≥ 95 on homepage
+- [ ] Lighthouse SEO = 100 on homepage
+- [ ] LCP < 2.5s on homepage (3G Fast network simulation)
+- [ ] CLS < 0.1 on all pages
+- [ ] Zero errors in browser console on production build
+- [ ] All animations feel smooth at 60fps on mid-range devices
+
+---
+
+## 9. Sprint 7 — Deployment, SEO & Launch
+
+**Duration:** Week 7 (Days 31–35)
+**Goal:** Final production deployment to Vercel, SEO configuration, DNS setup,
+post-launch verification, and handover documentation.
+
+---
+
+### 9.1 Deliverables
+
+- Live production deployment at company domain
+- SEO fully configured (sitemap, robots, JSON-LD)
+- Google Analytics 4 tracking active
+- Uptime monitoring configured
+- Handover documentation complete
+
+---
+
+### 9.2 Tasks
+
+#### Day 31 — SEO Final Configuration
+- Verify all page `metadata` objects in App Router pages
+- Generate `sitemap.xml` via `next-sitemap` package:
+  ```bash
+  npm install next-sitemap
+  # Configure in next-sitemap.config.js
+  ```
+- Verify `robots.txt` allows indexing for all public routes
+- Add JSON-LD structured data to homepage:
+  - `Organization` schema
+  - `LocalBusiness` schema with NAP (Name, Address, Phone)
+
+#### Day 32 — Production Build Verification
+```bash
+nx build web
+# Verify build completes with zero errors
+# Inspect .next/static for bundle sizes
+```
+- Run production build locally with `nx start web`
+- Test all forms in production build
+- Verify environment variables are not exposed in client bundle
+
+#### Day 33 — Vercel Production Deployment
+- Merge all changes to `main` branch
+- Connect GitHub repo to Vercel project
+- Set all environment variables in Vercel dashboard:
+  - `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`
+  - `CONTACT_EMAIL_TO`, `CAREERS_EMAIL_TO`
+  - `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_GA_MEASUREMENT_ID`
+- Deploy to production
+- Configure custom domain in Vercel
+
+#### Day 34 — DNS & Domain Configuration
+- Point company domain DNS to Vercel nameservers or add A/CNAME records
+- Verify HTTPS certificate provisioned automatically by Vercel
+- Test all pages on live domain
+- Submit sitemap to Google Search Console
+- Submit sitemap to Bing Webmaster Tools
+
+#### Day 35 — Post-Launch Verification & Handover
+- Confirm Google Analytics 4 is tracking page views
+- Set up Vercel Analytics (zero-config)
+- Test both forms on production domain — confirm emails arrive
+- Document any known issues or future improvements in GitHub Issues
+- Deliver final handover: credentials, DNS info, repo access, documentation links
+
+---
+
+### 9.3 Acceptance Criteria
+
+- [ ] Website live at `https://www.cgtechnoelectronics.com`
+- [ ] HTTPS active with valid certificate
+- [ ] All 7 pages load correctly on production domain
+- [ ] Both API forms deliver emails in production environment
+- [ ] `sitemap.xml` accessible at `/sitemap.xml`
+- [ ] `robots.txt` accessible at `/robots.txt`
+- [ ] Google Search Console property verified
+- [ ] Google Analytics 4 recording real sessions
+- [ ] Vercel deployment dashboard shows green (no errors)
+
+---
+
+## 10. Post-Launch Backlog (v2 Roadmap)
+
+| Feature                        | Sprint Estimate | Priority |
+|--------------------------------|-----------------|----------|
+| Google Analytics 4 Events      | 0.5 sprint      | P0       |
+| WhatsApp Business CTA          | 0.5 sprint      | P0       |
+| Blog / News section            | 1 sprint        | P1       |
+| Admin dashboard (form logs)    | 2 sprints       | P1       |
+| CMS integration (Sanity/Notion)| 2 sprints       | P1       |
+| Multi-language (Kannada/Hindi) | 2 sprints       | P2       |
+| Live chat (Crisp / Tawk.to)    | 0.5 sprint      | P2       |
+| Upstash Redis rate limiting    | 0.5 sprint      | P2       |
+| E-commerce catalog (no cart)   | 3 sprints       | P3       |
+| User portal / Auth             | 4+ sprints      | P3       |
+
+---
+
+*Document Owner: Engineering Team — CG Techno Electronics*
+*Last Updated: 2025*

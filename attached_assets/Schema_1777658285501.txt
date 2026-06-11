@@ -1,0 +1,482 @@
+# Schema.md
+# CG Techno Electronics — Data Schema Documentation
+# Version: 1.0.0
+
+---
+
+## 1. Overview
+
+CG Techno Electronics v1 operates without a persistent database. All data flows through
+serverless API routes and is dispatched via email. Despite this, strict TypeScript schemas
+are defined using **Zod** for runtime validation and **TypeScript interfaces** for compile-
+time type safety.
+
+This document covers:
+- API Payload Schemas (Contact & Application)
+- UI Data Schemas (Services, Products, Clients, Testimonials)
+- Configuration Schemas
+- Email Template Schemas
+
+---
+
+## 2. API Payload Schemas
+
+### 2.1 Contact / Enquiry Schema
+
+**Purpose:** Validates incoming POST /api/contact request body.
+
+```typescript
+// libs/features/src/schemas/contact.schema.ts
+
+import { z } from 'zod';
+
+export const ContactSchema = z.object({
+  name: z
+    .string()
+    .min(2, 'Name must be at least 2 characters')
+    .max(100, 'Name must not exceed 100 characters')
+    .trim(),
+
+  email: z
+    .string()
+    .email('Please enter a valid email address')
+    .toLowerCase()
+    .trim(),
+
+  phone: z
+    .string()
+    .regex(/^[6-9]\d{9}$/, 'Please enter a valid 10-digit Indian mobile number')
+    .trim(),
+
+  message: z
+    .string()
+    .min(10, 'Message must be at least 10 characters')
+    .max(1000, 'Message must not exceed 1000 characters')
+    .trim(),
+
+  service: z
+    .string()
+    .optional(),     // Pre-filled when navigating from service card CTA
+
+  product: z
+    .string()
+    .optional(),     // Pre-filled when navigating from product enquiry
+});
+
+export type ContactPayload = z.infer<typeof ContactSchema>;
+```
+
+**Field Reference Table:**
+
+| Field    | Type   | Required | Min | Max   | Validation                             |
+|----------|--------|----------|-----|-------|----------------------------------------|
+| name     | string | Yes      | 2   | 100   | Alphanumeric + spaces                  |
+| email    | string | Yes      | —   | 254   | RFC 5322 email format                  |
+| phone    | string | Yes      | 10  | 10    | Indian mobile: starts with 6–9         |
+| message  | string | Yes      | 10  | 1000  | No script injection (sanitized)        |
+| service  | string | No       | —   | 100   | Passed via query param                 |
+| product  | string | No       | —   | 100   | Passed via query param                 |
+
+---
+
+### 2.2 Application / Careers Schema
+
+**Purpose:** Validates incoming POST /api/apply request body.
+
+```typescript
+// libs/features/src/schemas/application.schema.ts
+
+import { z } from 'zod';
+
+export const AVAILABLE_ROLES = [
+  'IT Support Engineer',
+  'Network Administrator',
+  'Sales Executive',
+  'Business Development Manager',
+  'Intern - IT',
+  'Intern - Sales & Marketing',
+  'Other',
+] as const;
+
+export const ApplicationSchema = z.object({
+  name: z
+    .string()
+    .min(2, 'Name must be at least 2 characters')
+    .max(100, 'Name must not exceed 100 characters')
+    .trim(),
+
+  email: z
+    .string()
+    .email('Please enter a valid email address')
+    .toLowerCase()
+    .trim(),
+
+  phone: z
+    .string()
+    .regex(/^[6-9]\d{9}$/, 'Please enter a valid 10-digit Indian mobile number')
+    .trim(),
+
+  role: z.enum(AVAILABLE_ROLES, {
+    errorMap: () => ({ message: 'Please select a valid role' }),
+  }),
+
+  message: z
+    .string()
+    .max(1000, 'Message must not exceed 1000 characters')
+    .trim()
+    .optional(),
+
+  createdAt: z
+    .date()
+    .default(() => new Date()),
+});
+
+export type ApplicationPayload = z.infer<typeof ApplicationSchema>;
+```
+
+**Field Reference Table:**
+
+| Field     | Type   | Required | Min | Max  | Validation                          |
+|-----------|--------|----------|-----|------|-------------------------------------|
+| name      | string | Yes      | 2   | 100  | Alphanumeric + spaces               |
+| email     | string | Yes      | —   | 254  | RFC 5322 email format               |
+| phone     | string | Yes      | 10  | 10   | Indian mobile: starts with 6–9      |
+| role      | enum   | Yes      | —   | —    | Must be one of AVAILABLE_ROLES      |
+| message   | string | No       | —   | 1000 | Cover note / additional context     |
+| createdAt | Date   | Auto     | —   | —    | Server-assigned timestamp           |
+
+---
+
+### 2.3 API Response Schema
+
+**Purpose:** Standardized response shape for all API routes.
+
+```typescript
+// libs/features/src/schemas/api-response.schema.ts
+
+export interface ApiSuccessResponse {
+  success: true;
+  message: string;
+}
+
+export interface ApiErrorResponse {
+  success: false;
+  error: string;
+  details?: {
+    field: string;
+    message: string;
+  }[];
+}
+
+export type ApiResponse = ApiSuccessResponse | ApiErrorResponse;
+```
+
+**Success Example:**
+```json
+{
+  "success": true,
+  "message": "Submitted successfully"
+}
+```
+
+**Validation Error Example:**
+```json
+{
+  "success": false,
+  "error": "Validation failed",
+  "details": [
+    { "field": "email", "message": "Please enter a valid email address" },
+    { "field": "phone", "message": "Please enter a valid 10-digit Indian mobile number" }
+  ]
+}
+```
+
+**Server Error Example:**
+```json
+{
+  "success": false,
+  "error": "Email service unavailable. Please try again later."
+}
+```
+
+---
+
+## 3. UI Data Schemas
+
+### 3.1 Service Schema
+
+```typescript
+// libs/config/src/data/services.data.ts
+
+export interface Service {
+  id: string;                   // Unique slug: 'it-infrastructure'
+  title: string;                // Display title
+  shortDescription: string;     // Card preview (max 120 chars)
+  longDescription: string;      // Detail section body
+  icon: string;                 // Lucide icon name
+  features: string[];           // Bullet points of sub-features
+  ctaLabel: string;             // e.g. "Request IT Audit"
+  ctaHref: string;              // /contact?service=it-infrastructure
+  imageUrl?: string;            // Optional hero image for service page
+}
+```
+
+**Example Entry:**
+```typescript
+{
+  id: 'it-infrastructure',
+  title: 'IT Infrastructure',
+  shortDescription: 'End-to-end IT infrastructure setup, cabling, and hardware procurement for enterprises.',
+  longDescription: '...',
+  icon: 'Server',
+  features: [
+    'Structured network cabling',
+    'Hardware procurement & installation',
+    'LAN/WAN design and deployment',
+    'Annual maintenance contracts',
+  ],
+  ctaLabel: 'Request IT Audit',
+  ctaHref: '/contact?service=it-infrastructure',
+}
+```
+
+---
+
+### 3.2 Product Schema
+
+```typescript
+// libs/config/src/data/products.data.ts
+
+export type ProductCategory =
+  | 'Networking'
+  | 'Servers'
+  | 'CCTV'
+  | 'UPS'
+  | 'Accessories'
+  | 'Storage';
+
+export interface Product {
+  id: string;
+  name: string;
+  category: ProductCategory;
+  brand?: string;
+  shortDescription: string;
+  imageUrl: string;
+  specifications?: Record<string, string>;  // Key-value specs table
+  enquiryLabel?: string;                    // Default: "Enquire Now"
+}
+```
+
+**Example Entry:**
+```typescript
+{
+  id: 'hikvision-ip-cam-4mp',
+  name: 'Hikvision 4MP IP Dome Camera',
+  category: 'CCTV',
+  brand: 'Hikvision',
+  shortDescription: '4MP full HD IP dome camera with IR night vision up to 30m.',
+  imageUrl: '/images/products/hikvision-4mp.webp',
+  specifications: {
+    'Resolution': '4MP (2560x1440)',
+    'Night Vision': 'Up to 30m IR',
+    'Connectivity': 'Ethernet (PoE)',
+    'Weatherproofing': 'IP67',
+  },
+  enquiryLabel: 'Get Pricing',
+}
+```
+
+---
+
+### 3.3 Client / Partner Schema
+
+```typescript
+// libs/config/src/data/clients.data.ts
+
+export interface Client {
+  id: string;
+  name: string;
+  logoUrl: string;
+  industry?: string;    // 'IT', 'Banking', 'Healthcare', 'Government'
+  website?: string;
+  featured: boolean;    // Show in homepage marquee
+}
+```
+
+---
+
+### 3.4 Testimonial Schema
+
+```typescript
+// libs/config/src/data/testimonials.data.ts
+
+export interface Testimonial {
+  id: string;
+  quote: string;              // Max 300 characters
+  authorName: string;
+  authorTitle: string;        // e.g. "IT Manager, ABC Corp"
+  authorImageUrl?: string;
+  companyName: string;
+  companyLogoUrl?: string;
+  rating: 1 | 2 | 3 | 4 | 5;
+}
+```
+
+---
+
+### 3.5 Career / Job Opening Schema
+
+```typescript
+// libs/config/src/data/careers.data.ts
+
+export type EmploymentType = 'Full-Time' | 'Part-Time' | 'Internship' | 'Contract';
+export type ExperienceLevel = 'Entry' | 'Mid' | 'Senior';
+
+export interface JobOpening {
+  id: string;
+  title: string;
+  department: string;         // 'Engineering', 'Sales', 'Operations'
+  employmentType: EmploymentType;
+  experienceLevel: ExperienceLevel;
+  location: string;           // 'Bengaluru, Karnataka' or 'Remote'
+  shortDescription: string;
+  responsibilities: string[];
+  requirements: string[];
+  isActive: boolean;
+  postedAt: string;           // ISO date string
+}
+```
+
+---
+
+## 4. Configuration Schemas
+
+### 4.1 Site Configuration Schema
+
+```typescript
+// libs/config/src/site-config.ts
+
+export interface SiteConfig {
+  name: string;
+  tagline: string;
+  description: string;
+  url: string;
+  logo: string;
+  favicon: string;
+  contactEmail: string;
+  contactPhone: string;
+  address: {
+    street: string;
+    city: string;
+    state: string;
+    pincode: string;
+    country: string;
+  };
+  social: {
+    linkedin?: string;
+    twitter?: string;
+    instagram?: string;
+    youtube?: string;
+  };
+  seo: {
+    defaultTitle: string;
+    titleTemplate: string;    // '%s | CG Techno Electronics'
+    defaultDescription: string;
+    ogImage: string;
+    twitterHandle?: string;
+  };
+}
+```
+
+---
+
+### 4.2 Navigation Schema
+
+```typescript
+// libs/config/src/navigation.ts
+
+export interface NavLink {
+  label: string;
+  href: string;
+  isExternal?: boolean;
+  children?: NavLink[];       // Dropdown sub-items (v2)
+}
+
+export interface NavConfig {
+  primary: NavLink[];
+  cta: {
+    label: string;
+    href: string;
+    variant: 'primary' | 'outline';
+  };
+}
+```
+
+---
+
+## 5. Email Template Schema
+
+### 5.1 Contact Email Template Data
+
+```typescript
+// libs/features/src/email/contact-email.template.ts
+
+export interface ContactEmailData {
+  to: string;
+  from: string;
+  replyTo: string;
+  subject: string;
+  submitterName: string;
+  submitterEmail: string;
+  submitterPhone: string;
+  message: string;
+  service?: string;
+  product?: string;
+  receivedAt: string;   // Formatted date string
+  ipAddress?: string;   // For audit purposes
+}
+```
+
+### 5.2 Application Email Template Data
+
+```typescript
+// libs/features/src/email/application-email.template.ts
+
+export interface ApplicationEmailData {
+  to: string;
+  from: string;
+  replyTo: string;
+  subject: string;
+  applicantName: string;
+  applicantEmail: string;
+  applicantPhone: string;
+  appliedRole: string;
+  coverNote?: string;
+  receivedAt: string;
+}
+```
+
+---
+
+## 6. Schema Validation Strategy
+
+```
+Client Side:
+  └── React Hook Form resolver uses Zod schema
+  └── Errors shown inline per field on blur/submit
+
+Server Side:
+  └── Zod .safeParse() on raw request.json()
+  └── On failure: structured 400 response
+  └── On pass: sanitize and forward to Nodemailer
+
+Sanitization:
+  └── All string fields: .trim() applied in Zod schema
+  └── HTML stripped via sanitize-html before email dispatch
+  └── No SQL injection risk (no database used)
+```
+
+---
+
+*Document Owner: Engineering Team — CG Techno Electronics*
+*Last Updated: 2025*

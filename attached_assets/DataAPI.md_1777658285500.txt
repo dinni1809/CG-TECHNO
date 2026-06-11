@@ -1,0 +1,541 @@
+# DataAPI.md
+# CG Techno Electronics — API Reference Documentation
+# Version: 1.0.0 | Status: Production
+
+---
+
+## 1. Overview
+
+The CG Techno Electronics API consists of two serverless POST endpoints built on
+**Next.js Route Handlers** (App Router). These endpoints handle all user-submitted
+data — enquiries and job applications — validate inputs server-side, and dispatch
+notification emails via Nodemailer SMTP.
+
+There is no persistent database. All submission data is forwarded directly to the
+company's designated email inboxes.
+
+**Base URL:**
+```
+Production:  https://www.cgtechnoelectronics.com/api
+Development: http://localhost:3000/api
+```
+
+**Supported Methods:** POST only
+**Content-Type:** `application/json`
+**Authentication:** None (public endpoints; rate-limited per IP)
+
+---
+
+## 2. Endpoints Summary
+
+| Method | Endpoint        | Description                        | Rate Limit        |
+|--------|-----------------|------------------------------------|-------------------|
+| POST   | /api/contact    | Submit a customer enquiry          | 10 req/min per IP |
+| POST   | /api/apply      | Submit a job/internship application| 10 req/min per IP |
+
+---
+
+## 3. POST /api/contact
+
+### 3.1 Description
+
+Accepts a customer enquiry form submission. Validates all fields server-side using
+Zod, then dispatches a formatted HTML email to the company's primary inbox via SMTP.
+
+**Route file:** `apps/web/app/api/contact/route.ts`
+
+---
+
+### 3.2 Request
+
+**Headers:**
+```
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "name": "Rajesh Kumar",
+  "email": "rajesh.kumar@example.com",
+  "phone": "9876543210",
+  "message": "I need a quote for CCTV installation at our office premises in Whitefield.",
+  "service": "cctv-surveillance",
+  "product": ""
+}
+```
+
+**Field Specification:**
+
+| Field    | Type   | Required | Constraints                                             |
+|----------|--------|----------|---------------------------------------------------------|
+| name     | string | Yes      | Min 2 chars, Max 100 chars, trimmed                     |
+| email    | string | Yes      | Valid RFC 5322 email, lowercased, trimmed                |
+| phone    | string | Yes      | 10-digit Indian mobile (starts with 6–9), no spaces     |
+| message  | string | Yes      | Min 10 chars, Max 1000 chars, trimmed                   |
+| service  | string | No       | Pre-filled context from service CTA, Max 100 chars      |
+| product  | string | No       | Pre-filled context from product enquiry, Max 100 chars  |
+
+---
+
+### 3.3 Response
+
+**200 — Success**
+```json
+{
+  "success": true,
+  "message": "Submitted successfully"
+}
+```
+
+**400 — Validation Error**
+```json
+{
+  "success": false,
+  "error": "Validation failed",
+  "details": [
+    {
+      "field": "email",
+      "message": "Please enter a valid email address"
+    },
+    {
+      "field": "phone",
+      "message": "Please enter a valid 10-digit Indian mobile number"
+    }
+  ]
+}
+```
+
+**429 — Rate Limit Exceeded**
+```json
+{
+  "success": false,
+  "error": "Too many requests. Please wait a moment and try again."
+}
+```
+
+**500 — Email Service Error**
+```json
+{
+  "success": false,
+  "error": "Email service unavailable. Please try again later or contact us directly."
+}
+```
+
+---
+
+### 3.4 Route Implementation
+
+```typescript
+// apps/web/app/api/contact/route.ts
+
+import { NextRequest, NextResponse } from 'next/server';
+import { ContactSchema } from '@cg-techno/features';
+import { sendContactEmail } from '@cg-techno/features';
+import { checkRateLimit } from '@cg-techno/utils';
+
+export async function POST(request: NextRequest) {
+  try {
+    // Step 1: Rate Limit Check
+    const ip = request.headers.get('x-forwarded-for') ?? 'unknown';
+    const rateLimitResult = checkRateLimit(ip, 'contact');
+    if (!rateLimitResult.allowed) {
+      return NextResponse.json(
+        { success: false, error: 'Too many requests. Please wait a moment and try again.' },
+        { status: 429 }
+      );
+    }
+
+    // Step 2: Parse Body
+    const body = await request.json();
+
+    // Step 3: Server-Side Validation
+    const parsed = ContactSchema.safeParse(body);
+    if (!parsed.success) {
+      const details = parsed.error.errors.map((e) => ({
+        field: String(e.path[0]),
+        message: e.message,
+      }));
+      return NextResponse.json(
+        { success: false, error: 'Validation failed', details },
+        { status: 400 }
+      );
+    }
+
+    // Step 4: Send Email
+    await sendContactEmail(parsed.data);
+
+    // Step 5: Success
+    return NextResponse.json(
+      { success: true, message: 'Submitted successfully' },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error('[/api/contact] Unhandled error:', error);
+    return NextResponse.json(
+      { success: false, error: 'Email service unavailable. Please try again later.' },
+      { status: 500 }
+    );
+  }
+}
+```
+
+---
+
+### 3.5 Email Dispatched
+
+**To:** `info@cgtechnoelectronics.com` (env: `CONTACT_EMAIL_TO`)
+**From:** `noreply@cgtechnoelectronics.com` (env: `SMTP_USER`)
+**Reply-To:** Submitter's email address
+**Subject:** `New Enquiry from <name> — CG Techno Electronics`
+
+**HTML Email Body Includes:**
+- Submitter name, email, phone
+- Service context (if applicable)
+- Product context (if applicable)
+- Full message body
+- Submission timestamp (IST)
+
+---
+
+## 4. POST /api/apply
+
+### 4.1 Description
+
+Accepts a job or internship application. Validates all fields server-side, then
+dispatches a formatted HTML email to the company's HR inbox via SMTP.
+
+**Route file:** `apps/web/app/api/apply/route.ts`
+
+---
+
+### 4.2 Request
+
+**Headers:**
+```
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "name": "Priya Sharma",
+  "email": "priya.sharma@example.com",
+  "phone": "8765432109",
+  "role": "Intern - IT",
+  "message": "I am a final year B.Tech student with a strong interest in networking and IT infrastructure. I am eager to contribute and learn."
+}
+```
+
+**Field Specification:**
+
+| Field   | Type   | Required | Constraints                                                    |
+|---------|--------|----------|----------------------------------------------------------------|
+| name    | string | Yes      | Min 2 chars, Max 100 chars, trimmed                            |
+| email   | string | Yes      | Valid RFC 5322 email, lowercased, trimmed                      |
+| phone   | string | Yes      | 10-digit Indian mobile (starts with 6–9), no spaces            |
+| role    | enum   | Yes      | Must be one of the predefined AVAILABLE_ROLES values           |
+| message | string | No       | Max 1000 chars (cover note), trimmed                           |
+
+**Available Role Values (enum):**
+```
+"IT Support Engineer"
+"Network Administrator"
+"Sales Executive"
+"Business Development Manager"
+"Intern - IT"
+"Intern - Sales & Marketing"
+"Other"
+```
+
+---
+
+### 4.3 Response
+
+**200 — Success**
+```json
+{
+  "success": true,
+  "message": "Application received successfully"
+}
+```
+
+**400 — Validation Error**
+```json
+{
+  "success": false,
+  "error": "Validation failed",
+  "details": [
+    {
+      "field": "role",
+      "message": "Please select a valid role"
+    }
+  ]
+}
+```
+
+**429 — Rate Limit Exceeded**
+```json
+{
+  "success": false,
+  "error": "Too many requests. Please wait a moment and try again."
+}
+```
+
+**500 — Email Service Error**
+```json
+{
+  "success": false,
+  "error": "Email service unavailable. Please try again later or contact us directly."
+}
+```
+
+---
+
+### 4.4 Route Implementation
+
+```typescript
+// apps/web/app/api/apply/route.ts
+
+import { NextRequest, NextResponse } from 'next/server';
+import { ApplicationSchema } from '@cg-techno/features';
+import { sendApplicationEmail } from '@cg-techno/features';
+import { checkRateLimit } from '@cg-techno/utils';
+
+export async function POST(request: NextRequest) {
+  try {
+    // Step 1: Rate Limit Check
+    const ip = request.headers.get('x-forwarded-for') ?? 'unknown';
+    const rateLimitResult = checkRateLimit(ip, 'apply');
+    if (!rateLimitResult.allowed) {
+      return NextResponse.json(
+        { success: false, error: 'Too many requests. Please wait a moment and try again.' },
+        { status: 429 }
+      );
+    }
+
+    // Step 2: Parse Body
+    const body = await request.json();
+
+    // Step 3: Server-Side Validation
+    const parsed = ApplicationSchema.safeParse(body);
+    if (!parsed.success) {
+      const details = parsed.error.errors.map((e) => ({
+        field: String(e.path[0]),
+        message: e.message,
+      }));
+      return NextResponse.json(
+        { success: false, error: 'Validation failed', details },
+        { status: 400 }
+      );
+    }
+
+    // Step 4: Send Email
+    await sendApplicationEmail(parsed.data);
+
+    // Step 5: Success
+    return NextResponse.json(
+      { success: true, message: 'Application received successfully' },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error('[/api/apply] Unhandled error:', error);
+    return NextResponse.json(
+      { success: false, error: 'Email service unavailable. Please try again later.' },
+      { status: 500 }
+    );
+  }
+}
+```
+
+---
+
+### 4.5 Email Dispatched
+
+**To:** `hr@cgtechnoelectronics.com` (env: `CAREERS_EMAIL_TO`)
+**From:** `noreply@cgtechnoelectronics.com` (env: `SMTP_USER`)
+**Reply-To:** Applicant's email address
+**Subject:** `New Application — <role> from <name>`
+
+**HTML Email Body Includes:**
+- Applicant name, email, phone
+- Role applied for
+- Cover note / message (if provided)
+- Submission timestamp (IST)
+
+---
+
+## 5. Nodemailer Transport Setup
+
+```typescript
+// libs/features/src/email/mailer.ts
+
+import nodemailer from 'nodemailer';
+
+export const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,       // smtp.gmail.com
+  port: Number(process.env.SMTP_PORT), // 587
+  secure: false,                     // STARTTLS
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASSWORD, // Gmail App Password
+  },
+});
+
+export async function verifyTransport(): Promise<boolean> {
+  try {
+    await transporter.verify();
+    return true;
+  } catch {
+    return false;
+  }
+}
+```
+
+---
+
+## 6. Rate Limiting Implementation
+
+```typescript
+// libs/utils/src/rate-limit.ts
+
+type Store = Map<string, { count: number; resetAt: number }>;
+
+const store: Store = new Map();
+const WINDOW_MS = 60 * 1000; // 1 minute
+const MAX_REQUESTS = 10;
+
+export function checkRateLimit(ip: string, context: string): { allowed: boolean } {
+  const key = `${context}:${ip}`;
+  const now = Date.now();
+  const entry = store.get(key);
+
+  if (!entry || now > entry.resetAt) {
+    store.set(key, { count: 1, resetAt: now + WINDOW_MS });
+    return { allowed: true };
+  }
+
+  if (entry.count >= MAX_REQUESTS) {
+    return { allowed: false };
+  }
+
+  entry.count++;
+  return { allowed: true };
+}
+```
+
+> **Note:** In-memory store resets on serverless cold starts. For persistent rate
+> limiting across all edge instances, upgrade to Upstash Redis in v2.
+
+---
+
+## 7. Error Code Reference
+
+| HTTP Status | Code String             | Trigger                                          |
+|-------------|-------------------------|--------------------------------------------------|
+| 200         | success: true           | Validation passed, email sent successfully       |
+| 400         | Validation failed       | One or more input fields fail Zod schema         |
+| 405         | Method Not Allowed      | Non-POST request hits the endpoint               |
+| 429         | Too many requests       | IP exceeds 10 requests per minute                |
+| 500         | Email service error     | SMTP connection failure or Nodemailer error      |
+
+---
+
+## 8. CORS Configuration
+
+API routes are accessible only from the same origin in v1. No external cross-origin
+access is permitted. Vercel automatically handles CORS headers for same-origin requests.
+
+If multi-origin access is required in future, configure in `next.config.js`:
+
+```javascript
+// next.config.js (future reference)
+async headers() {
+  return [
+    {
+      source: '/api/:path*',
+      headers: [
+        { key: 'Access-Control-Allow-Origin', value: 'https://www.cgtechnoelectronics.com' },
+        { key: 'Access-Control-Allow-Methods', value: 'POST' },
+        { key: 'Access-Control-Allow-Headers', value: 'Content-Type' },
+      ],
+    },
+  ];
+},
+```
+
+---
+
+## 9. Testing the API
+
+### 9.1 Using cURL
+
+**Contact Enquiry:**
+```bash
+curl -X POST http://localhost:3000/api/contact \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Test User",
+    "email": "test@example.com",
+    "phone": "9876543210",
+    "message": "This is a test enquiry message for CG Techno Electronics."
+  }'
+```
+
+**Job Application:**
+```bash
+curl -X POST http://localhost:3000/api/apply \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Test Applicant",
+    "email": "applicant@example.com",
+    "phone": "8765432109",
+    "role": "Intern - IT",
+    "message": "I am interested in the IT internship position."
+  }'
+```
+
+### 9.2 Validation Error Test
+
+```bash
+curl -X POST http://localhost:3000/api/contact \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "A",
+    "email": "not-an-email",
+    "phone": "12345",
+    "message": "Short"
+  }'
+```
+
+**Expected Response:**
+```json
+{
+  "success": false,
+  "error": "Validation failed",
+  "details": [
+    { "field": "name", "message": "Name must be at least 2 characters" },
+    { "field": "email", "message": "Please enter a valid email address" },
+    { "field": "phone", "message": "Please enter a valid 10-digit Indian mobile number" },
+    { "field": "message", "message": "Message must be at least 10 characters" }
+  ]
+}
+```
+
+---
+
+## 10. Future API Enhancements (v2+)
+
+| Feature                    | Description                                           |
+|----------------------------|-------------------------------------------------------|
+| Upstash Redis rate limit   | Persistent rate limiting across serverless instances  |
+| Honeypot spam protection   | Hidden field to trap bot submissions                  |
+| hCaptcha / Turnstile       | CAPTCHA on high-traffic form submissions              |
+| Webhook support            | Trigger Slack/Teams notification on submission        |
+| GET /api/health            | Health check endpoint for monitoring                  |
+| Submission logging         | Write to Vercel KV or Notion database via API         |
+
+---
+
+*Document Owner: Engineering Team — CG Techno Electronics*
+*Last Updated: 2025*

@@ -1,0 +1,393 @@
+# Architecture.md
+# CG Techno Electronics — System Architecture Documentation
+# Version: 1.0.0
+
+---
+
+## 1. Architecture Overview
+
+CG Techno Electronics is built on a **Nx Monorepo** architecture using **Next.js 14
+with the App Router**. The system is static-first with serverless API routes for form
+handling. There is no traditional backend server or database — all submission logic
+is handled at the edge via Next.js API routes and Nodemailer SMTP.
+
+**Core Principles:**
+- Static rendering by default (SSG) for all content pages
+- Serverless functions only for form processing
+- Modular Nx library architecture for reusability and scalability
+- Zero backend infrastructure costs in v1
+
+---
+
+## 2. System Architecture Diagram
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                          CLIENT (Browser)                           │
+│  Next.js Static HTML + Hydrated React + Framer Motion Animations    │
+└───────────────────────────────────┬─────────────────────────────────┘
+                                    │ HTTPS
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                           VERCEL CDN                                │
+│   Global Edge Network — Static assets served from nearest PoP       │
+│   Serverless Functions deployed at regional edges                    │
+└───────┬───────────────────────────────────────────────┬─────────────┘
+        │ Static files (HTML, CSS, JS, Images)           │ /api/* routes
+        ▼                                                ▼
+┌────────────────────────┐              ┌──────────────────────────────┐
+│    NEXT.JS APP ROUTER  │              │   NEXT.JS API ROUTES         │
+│                        │              │   (Serverless / Edge)         │
+│  /               SSG   │              │                              │
+│  /about          SSG   │              │   POST /api/contact          │
+│  /services       SSG   │              │   POST /api/apply            │
+│  /products       SSG   │              │                              │
+│  /clients        SSG   │              │   ┌──────────────────────┐   │
+│  /careers        SSG   │              │   │  1. Rate Limit Check │   │
+│  /contact        SSR   │              │   │  2. Zod Validation   │   │
+│                        │              │   │  3. Sanitization     │   │
+└────────────────────────┘              │   │  4. Nodemailer Send  │   │
+                                        │   │  5. JSON Response    │   │
+                                        │   └──────────────────────┘   │
+                                        └──────────────┬───────────────┘
+                                                       │ SMTP
+                                                       ▼
+                                        ┌──────────────────────────────┐
+                                        │   EMAIL SERVICE (SMTP)       │
+                                        │   Gmail / SendGrid           │
+                                        │                              │
+                                        │   → Company Inbox            │
+                                        │   → HR Inbox                 │
+                                        └──────────────────────────────┘
+```
+
+---
+
+## 3. Nx Monorepo Structure
+
+```
+cg-techno-electronics/
+│
+├── apps/
+│   └── web/                          # Main Next.js application
+│       ├── app/                      # App Router directory
+│       │   ├── layout.tsx            # Root layout (Navbar, Footer, ToastProvider)
+│       │   ├── page.tsx              # Homepage
+│       │   ├── about/
+│       │   │   └── page.tsx
+│       │   ├── services/
+│       │   │   └── page.tsx
+│       │   ├── products/
+│       │   │   └── page.tsx
+│       │   ├── clients/
+│       │   │   └── page.tsx
+│       │   ├── careers/
+│       │   │   └── page.tsx
+│       │   ├── contact/
+│       │   │   └── page.tsx
+│       │   ├── api/
+│       │   │   ├── contact/
+│       │   │   │   └── route.ts      # POST /api/contact
+│       │   │   └── apply/
+│       │   │       └── route.ts      # POST /api/apply
+│       │   ├── not-found.tsx         # Custom 404 page
+│       │   └── error.tsx             # Global error boundary
+│       │
+│       ├── public/                   # Static assets
+│       │   ├── images/
+│       │   │   ├── hero/
+│       │   │   ├── products/
+│       │   │   ├── clients/
+│       │   │   └── team/
+│       │   ├── favicon.ico
+│       │   ├── og-image.jpg
+│       │   ├── sitemap.xml           # Auto-generated
+│       │   └── robots.txt
+│       │
+│       ├── next.config.js
+│       ├── tsconfig.json
+│       └── project.json              # Nx project config
+│
+├── libs/
+│   │
+│   ├── ui/                           # Reusable UI primitives
+│   │   └── src/
+│   │       ├── components/
+│   │       │   ├── Button/
+│   │       │   │   ├── Button.tsx
+│   │       │   │   ├── Button.test.tsx
+│   │       │   │   └── index.ts
+│   │       │   ├── Card/
+│   │       │   ├── Badge/
+│   │       │   ├── Input/
+│   │       │   ├── Textarea/
+│   │       │   ├── Select/
+│   │       │   ├── Modal/
+│   │       │   ├── Toast/
+│   │       │   ├── Spinner/
+│   │       │   ├── Navbar/
+│   │       │   └── Footer/
+│   │       └── index.ts              # Barrel export
+│   │
+│   ├── sections/                     # Homepage + page sections
+│   │   └── src/
+│   │       ├── Hero/
+│   │       │   ├── HeroSection.tsx
+│   │       │   └── index.ts
+│   │       ├── Stats/
+│   │       ├── Services/
+│   │       │   ├── ServicesSection.tsx
+│   │       │   └── ServiceCard.tsx
+│   │       ├── Products/
+│   │       │   ├── ProductsSection.tsx
+│   │       │   └── ProductCard.tsx
+│   │       ├── Clients/
+│   │       ├── Testimonials/
+│   │       ├── About/
+│   │       ├── Careers/
+│   │       ├── Contact/
+│   │       └── CTABanner/
+│   │
+│   ├── features/                     # Business logic
+│   │   └── src/
+│   │       ├── schemas/
+│   │       │   ├── contact.schema.ts
+│   │       │   └── application.schema.ts
+│   │       ├── forms/
+│   │       │   ├── ContactForm.tsx
+│   │       │   └── ApplicationForm.tsx
+│   │       ├── email/
+│   │       │   ├── mailer.ts         # Nodemailer transport setup
+│   │       │   ├── contact-email.template.ts
+│   │       │   └── application-email.template.ts
+│   │       ├── hooks/
+│   │       │   ├── useContactForm.ts
+│   │       │   └── useApplicationForm.ts
+│   │       └── context/
+│   │           └── ToastContext.tsx
+│   │
+│   ├── utils/                        # Pure helper functions
+│   │   └── src/
+│   │       ├── format.ts             # Date, phone, string formatters
+│   │       ├── validate.ts           # Regex patterns
+│   │       ├── sanitize.ts           # HTML strip utility
+│   │       ├── rate-limit.ts         # IP rate limiting helper
+│   │       └── cn.ts                 # Tailwind class merging (clsx + twMerge)
+│   │
+│   └── config/                       # Static data + site metadata
+│       └── src/
+│           ├── site-config.ts        # Company info, SEO defaults
+│           ├── navigation.ts         # Navbar link definitions
+│           └── data/
+│               ├── services.data.ts
+│               ├── products.data.ts
+│               ├── clients.data.ts
+│               ├── testimonials.data.ts
+│               └── careers.data.ts
+│
+├── tools/                            # Custom Nx generators/executors
+│
+├── nx.json                           # Nx workspace config
+├── package.json
+├── tsconfig.base.json
+├── .eslintrc.json
+├── .prettierrc
+├── .env.local.example                # Environment variable template
+└── README.md
+```
+
+---
+
+## 4. Technology Stack Architecture
+
+### 4.1 Frontend Layer
+
+| Concern              | Technology           | Rationale                                     |
+|----------------------|----------------------|-----------------------------------------------|
+| Framework            | Next.js 14 App Router| RSC, SSG, built-in API routes                 |
+| Language             | TypeScript 5 (strict)| Type safety, intellisense, maintainability    |
+| Styling              | Tailwind CSS 3       | Utility-first, no CSS conflicts in monorepo   |
+| Animation            | Framer Motion 11     | Declarative, production-grade React animations|
+| Form handling        | React Hook Form + Zod| Performant, schema-driven validation           |
+| Icons                | Lucide React         | Consistent, tree-shakeable SVG icons          |
+| Class merging        | clsx + tailwind-merge| Conflict-safe Tailwind class composition      |
+
+### 4.2 Backend Layer (Serverless)
+
+| Concern              | Technology           | Rationale                                     |
+|----------------------|----------------------|-----------------------------------------------|
+| API Routes           | Next.js Route Handlers| Co-located with frontend, no separate server |
+| Email dispatch       | Nodemailer           | Mature, flexible SMTP library                 |
+| Input validation     | Zod                  | Shared schemas with frontend                  |
+| Rate limiting        | Custom in-memory     | No external service needed in v1              |
+
+### 4.3 Infrastructure Layer
+
+| Concern              | Technology           | Rationale                                     |
+|----------------------|----------------------|-----------------------------------------------|
+| Deployment           | Vercel               | Zero-config Next.js deployment, CDN, edge fn  |
+| Monorepo             | Nx 18+               | Build caching, project graph, modularization  |
+| Version control      | Git + GitHub         | Industry standard, Vercel GitHub integration  |
+| CI/CD                | Vercel GitHub Actions| Auto-deploy on push to main                   |
+
+---
+
+## 5. Data Flow Architecture
+
+### 5.1 Static Content Flow
+
+```
+libs/config/src/data/*.ts
+        │
+        │ Import at build time
+        ▼
+apps/web/app/**/page.tsx  (Next.js SSG)
+        │
+        │ Rendered to static HTML at build
+        ▼
+Vercel CDN
+        │
+        │ Served from edge cache
+        ▼
+Browser (Zero server load, instant load times)
+```
+
+### 5.2 Form Submission Flow
+
+```
+Browser Form (React Hook Form)
+        │
+        │ Client-side Zod validation
+        │ fetch() POST with JSON body
+        ▼
+Vercel Serverless Function (apps/web/app/api/contact/route.ts)
+        │
+        │ Server-side Zod .safeParse()
+        │ Nodemailer SMTP send
+        ▼
+Company Email Inbox
+        │
+        │ JSON response { success: true/false }
+        ▼
+Browser (Toast notification displayed)
+```
+
+---
+
+## 6. Nx Build System Architecture
+
+### 6.1 Project Graph
+
+```
+apps/web
+├── depends on → libs/ui
+├── depends on → libs/sections
+├── depends on → libs/features
+├── depends on → libs/utils
+└── depends on → libs/config
+
+libs/sections
+├── depends on → libs/ui
+├── depends on → libs/config
+└── depends on → libs/utils
+
+libs/features
+├── depends on → libs/utils
+└── depends on → libs/config
+
+libs/ui
+└── depends on → libs/utils
+```
+
+### 6.2 Nx Commands Architecture
+
+```bash
+# Build only affected projects (intelligent caching)
+nx affected:build
+
+# Run dev server
+nx serve web
+
+# Run all tests
+nx run-many --target=test --all
+
+# Lint all libraries
+nx run-many --target=lint --all
+
+# Generate a new component in libs/ui
+nx g @nx/react:component Button --project=ui
+
+# View project dependency graph
+nx graph
+```
+
+### 6.3 TypeScript Path Aliases
+
+```json
+// tsconfig.base.json
+{
+  "compilerOptions": {
+    "paths": {
+      "@cg-techno/ui": ["libs/ui/src/index.ts"],
+      "@cg-techno/sections": ["libs/sections/src/index.ts"],
+      "@cg-techno/features": ["libs/features/src/index.ts"],
+      "@cg-techno/utils": ["libs/utils/src/index.ts"],
+      "@cg-techno/config": ["libs/config/src/index.ts"]
+    }
+  }
+}
+```
+
+---
+
+## 7. Security Architecture
+
+| Threat                      | Mitigation                                              |
+|-----------------------------|---------------------------------------------------------|
+| XSS via form input          | Zod .trim() + sanitize-html before email dispatch       |
+| CSRF attacks                | SameSite cookie policy; no sessions in v1               |
+| Spam / Bot submissions      | IP rate limiting (10 req/min), honeypot field (v2)      |
+| SMTP credential exposure    | Environment variables; never committed to Git            |
+| Dependency vulnerabilities  | npm audit in CI; Dependabot on GitHub                   |
+| Sensitive data in logs      | No PII logged in API routes                             |
+
+---
+
+## 8. Performance Architecture
+
+| Strategy                    | Implementation                                          |
+|-----------------------------|---------------------------------------------------------|
+| Static generation           | Next.js SSG for all content pages                       |
+| Image optimization          | next/image with WebP format + lazy loading              |
+| Font optimization           | next/font with self-hosted Inter + Space Grotesk        |
+| Code splitting              | Automatic via Next.js App Router                        |
+| Tree shaking                | Nx build with esbuild + Webpack                         |
+| CDN caching                 | Vercel global edge network                              |
+| Bundle analysis             | @next/bundle-analyzer in CI                             |
+
+---
+
+## 9. Environment Configuration
+
+```bash
+# .env.local.example (commit this file, never .env.local)
+
+# SMTP Configuration
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=noreply@cgtechnoelectronics.com
+SMTP_PASSWORD=your_app_password_here
+
+# Company Inbox Targets
+CONTACT_EMAIL_TO=info@cgtechnoelectronics.com
+CAREERS_EMAIL_TO=hr@cgtechnoelectronics.com
+
+# Application
+NEXT_PUBLIC_SITE_URL=https://www.cgtechnoelectronics.com
+NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+```
+
+---
+
+*Document Owner: Engineering Team — CG Techno Electronics*
+*Last Updated: 2025*

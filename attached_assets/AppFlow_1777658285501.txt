@@ -1,0 +1,380 @@
+# AppFlow.md
+# CG Techno Electronics — Application Flow Documentation
+# Version: 1.0.0
+
+---
+
+## 1. Overview
+
+This document defines every interaction and data flow within the CG Techno Electronics
+website — from initial page load to form submission and email confirmation. Flows are
+broken into Visitor Journeys, System Flows, and Error Flows.
+
+---
+
+## 2. High-Level Application Flow Diagram
+
+```
+┌────────────────────────────────────────────────────────┐
+│                     VISITOR                            │
+└───────────────────────────┬────────────────────────────┘
+                            │
+                            ▼
+┌────────────────────────────────────────────────────────┐
+│              NEXT.JS FRONTEND (App Router)             │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐  │
+│  │   Home   │ │ Services │ │ Products │ │ Careers  │  │
+│  └──────────┘ └──────────┘ └──────────┘ └──────────┘  │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐               │
+│  │  About   │ │ Clients  │ │ Contact  │               │
+│  └──────────┘ └──────────┘ └──────────┘               │
+└───────────────────────────┬────────────────────────────┘
+                            │ Form Submit (POST)
+                            ▼
+┌────────────────────────────────────────────────────────┐
+│              NEXT.JS API ROUTES (Serverless)           │
+│                                                        │
+│   POST /api/contact        POST /api/apply             │
+│   ┌─────────────────┐      ┌──────────────────┐        │
+│   │ 1. Receive JSON │      │ 1. Receive JSON  │        │
+│   │ 2. Validate     │      │ 2. Validate      │        │
+│   │ 3. Sanitize     │      │ 3. Sanitize      │        │
+│   │ 4. Send Email   │      │ 4. Send Email    │        │
+│   │ 5. Return JSON  │      │ 5. Return JSON   │        │
+│   └─────────────────┘      └──────────────────┘        │
+└───────────────────────────┬────────────────────────────┘
+                            │ SMTP
+                            ▼
+┌────────────────────────────────────────────────────────┐
+│              EMAIL SERVICE (Nodemailer + SMTP)         │
+│   - Gmail App Password / SendGrid SMTP                 │
+│   - Sends notification to company inbox                │
+└────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 3. Visitor Journey Flows
+
+### 3.1 Homepage Discovery Flow
+
+```
+User opens browser
+        │
+        ▼
+Enters URL / clicks link → Next.js serves static HTML (SSG)
+        │
+        ▼
+Page hydrates → Framer Motion animations trigger
+        │
+        ▼
+Navbar renders (sticky, blurred on scroll)
+        │
+        ▼
+Hero section loads → animated headline + gradient background
+        │
+        ▼
+User scrolls → IntersectionObserver fires:
+        │   ├─ Stats counters animate (0 → target values)
+        │   ├─ Service cards fade-slide in
+        │   ├─ Products preview reveals
+        │   └─ Client logos marquee begins
+        │
+        ▼
+User clicks primary CTA ("Enquire Now") → /contact
+```
+
+---
+
+### 3.2 Services Discovery Flow
+
+```
+User clicks "Services" in Navbar
+        │
+        ▼
+/services page loads (static)
+        │
+        ▼
+6 service category cards render:
+  - IT Infrastructure
+  - CCTV & Surveillance
+  - Server Solutions
+  - E-Waste Management
+  - Product Distribution
+  - Rental / Lease
+        │
+        ▼
+User clicks a service card → card expands or scrolls to detail section
+        │
+        ▼
+"Get a Quote" CTA button → /contact?service=<service-name>
+        │
+        ▼
+Contact form pre-fills service context in message field
+```
+
+---
+
+### 3.3 Products Exploration Flow
+
+```
+User clicks "Products" in Navbar
+        │
+        ▼
+/products page loads
+        │
+        ▼
+Category filter tabs render:
+  All | Networking | Servers | CCTV | Accessories | UPS
+        │
+        ▼
+User clicks a category tab
+        │
+        ▼
+Product grid filters (client-side, no API call)
+        │
+        ▼
+User clicks "Enquire" on a product card
+        │
+        ├─ Option A: Modal opens with pre-filled product name
+        │       └─ User fills form → submits → POST /api/contact
+        │
+        └─ Option B: Navigates to /contact?product=<product-name>
+                └─ Contact form pre-fills product in message
+```
+
+---
+
+### 3.4 Contact / Enquiry Submission Flow
+
+```
+User navigates to /contact
+        │
+        ▼
+Contact form renders (React Hook Form)
+        │
+        ▼
+User fills fields:
+  - Name (text input)
+  - Email (email input)
+  - Phone (tel input)
+  - Message (textarea)
+        │
+        ▼
+User clicks "Submit"
+        │
+        ▼
+CLIENT-SIDE VALIDATION (Zod schema)
+        │
+        ├─ FAIL → Inline error messages appear per field
+        │          User corrects and re-submits
+        │
+        └─ PASS → POST /api/contact (JSON body)
+                    │
+                    ▼
+               API ROUTE: /api/contact
+                    │
+                    ├─ Rate limit check (10 req/min per IP)
+                    │       └─ Exceeded → 429 response → UI shows rate limit error
+                    │
+                    ├─ Server-side Zod validation
+                    │       └─ FAIL → 400 response → UI shows error toast
+                    │
+                    ├─ Nodemailer sends email to company inbox
+                    │       └─ SMTP error → 500 response → UI shows retry message
+                    │
+                    └─ SUCCESS → 200 response
+                                    │
+                                    ▼
+                               UI shows success toast:
+                               "Thank you! We will contact you shortly."
+                               Form resets to empty state
+```
+
+---
+
+### 3.5 Careers / Application Submission Flow
+
+```
+User navigates to /careers
+        │
+        ▼
+Careers page loads:
+  - Company culture section
+  - Open positions list
+  - Application form
+        │
+        ▼
+User browses open positions
+        │
+        ▼
+User scrolls to Application Form
+        │
+        ▼
+User fills fields:
+  - Name
+  - Email
+  - Phone
+  - Role (dropdown selection)
+  - Message / Cover Note
+        │
+        ▼
+User clicks "Apply Now"
+        │
+        ▼
+CLIENT-SIDE VALIDATION (Zod schema)
+        │
+        ├─ FAIL → Inline field errors displayed
+        │
+        └─ PASS → POST /api/apply (JSON body)
+                    │
+                    ▼
+               API ROUTE: /api/apply
+                    │
+                    ├─ Rate limit check
+                    ├─ Server-side validation
+                    ├─ Nodemailer sends application email to HR inbox
+                    │
+                    └─ SUCCESS → 200 response
+                                    │
+                                    ▼
+                               UI shows:
+                               "Application received! Our HR team will be in touch."
+                               Form resets
+```
+
+---
+
+### 3.6 About / Company Profile Flow
+
+```
+User clicks "About" or "Profile" in Navbar
+        │
+        ▼
+/about page loads (static — SSG)
+        │
+        ▼
+Sections render:
+  - Company story / founding narrative
+  - Mission & Vision statements
+  - Core values (icon cards)
+  - Team / Leadership section
+  - Awards & Certifications
+  - "Partner With Us" CTA → /contact
+```
+
+---
+
+### 3.7 Clients Page Flow
+
+```
+User navigates to /clients
+        │
+        ▼
+Page loads with:
+  - Client logo grid (animated on scroll)
+  - Industry badges (Government, Banking, IT, Healthcare, etc.)
+  - Testimonial cards (carousel or grid)
+  - Key metrics (number of clients, cities served, etc.)
+        │
+        ▼
+No interactions required — fully static content
+```
+
+---
+
+## 4. System-Level Flow: API Route Execution
+
+```
+POST Request arrives at /api/contact or /api/apply
+        │
+        ▼
+Next.js Edge / Node.js Runtime receives request
+        │
+        ▼
+Step 1: IP Rate Limit Check
+  └─ Uses in-memory store or Upstash Redis (v2 upgrade)
+  └─ > 10 requests/min → return 429 { success: false, error: "Too many requests" }
+        │
+        ▼
+Step 2: Parse Request Body
+  └─ await request.json()
+  └─ Parse failure → return 400
+        │
+        ▼
+Step 3: Server-Side Schema Validation (Zod)
+  └─ Validates all required fields
+  └─ Checks formats (email regex, phone digits)
+  └─ Failure → return 400 { success: false, error: "Validation failed", details: [...] }
+        │
+        ▼
+Step 4: Build Email Payload (Nodemailer)
+  └─ Transport: SMTP (Gmail App Password or SendGrid)
+  └─ From: noreply@cgtechnoelectronics.com
+  └─ To: info@cgtechnoelectronics.com
+  └─ Subject: "New Enquiry from <name>" / "New Application from <name>"
+  └─ HTML body with formatted submission data
+        │
+        ▼
+Step 5: Send Email
+  └─ transporter.sendMail(mailOptions)
+  └─ SMTP failure → return 500 { success: false, error: "Email service unavailable" }
+        │
+        ▼
+Step 6: Return Success Response
+  └─ return 200 { success: true, message: "Submitted successfully" }
+```
+
+---
+
+## 5. Navigation Flow Map
+
+```
+Homepage (/)
+├── /about          ← "About Us" navbar link
+├── /services       ← "Services" navbar link
+│     └── /contact?service=X   ← "Get Quote" CTA on service card
+├── /products       ← "Products" navbar link
+│     └── /contact?product=X   ← "Enquire" on product card
+├── /clients        ← "Clients" navbar link
+├── /careers        ← "Careers" navbar link
+│     └── POST /api/apply      ← Application form submission
+└── /contact        ← "Contact" navbar link + "Enquire Now" CTA
+      └── POST /api/contact    ← Enquiry form submission
+```
+
+---
+
+## 6. Error States & Fallbacks
+
+| Scenario                        | Behavior                                              |
+|----------------------------------|-------------------------------------------------------|
+| Network offline (form submit)    | Show: "No internet connection. Please try again."     |
+| API 400 (validation fail)        | Show inline error messages from API response          |
+| API 429 (rate limit)             | Show: "Too many requests. Please wait a moment."      |
+| API 500 (email service down)     | Show: "Something went wrong. Please email us directly."|
+| Image load failure               | Show placeholder with alt text                        |
+| JavaScript disabled              | Core content visible (SSG HTML), forms non-functional |
+| 404 Page not found               | Custom 404 page with navigation links                 |
+| Unhandled error                  | Global error.tsx boundary with support contact        |
+
+---
+
+## 7. State Management Flow
+
+No global state manager (Redux/Zustand) required for v1.
+
+State is managed at component level:
+
+```
+Form State       → React Hook Form (local component state)
+Toast/Alerts     → React Context (ToastContext wraps layout)
+Navbar scroll    → useEffect + window scroll listener
+Animation state  → Framer Motion (self-managed)
+Filter state     → useState in Products page component
+```
+
+---
+
+*Document Owner: Engineering Team — CG Techno Electronics*
+*Last Updated: 2025*
