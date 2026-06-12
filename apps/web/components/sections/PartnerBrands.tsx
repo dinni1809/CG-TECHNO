@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { Handshake } from 'lucide-react';
+import Image from 'next/image';
 import { SectionHeader } from '../ui/SectionHeader';
 
 const brands = [
@@ -39,10 +40,18 @@ export function PartnerBrands() {
                 whileHover={{ scale: 1.05 }}
                 className="flex flex-col items-center justify-center bg-white border border-gray-100/80 rounded-xl px-8 py-4 min-w-[180px] shadow-sm hover:shadow-md transition-shadow cursor-default"
               >
-                <span className="text-xl font-bold font-heading text-gray-800 tracking-tight">
+                <div className="relative w-[140px] h-12 flex items-center justify-center">
+                  <Image
+                    src={`/logos/${brand.name.toLowerCase()}.svg`}
+                    alt={`${brand.name} Logo`}
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+                <span className="text-xs font-medium text-slate-800 mt-2 tracking-tight">
                   {brand.name}
                 </span>
-                <span className="text-[10px] text-gray-500 font-medium mt-1 uppercase text-center leading-tight">
+                <span className="text-[9px] text-gray-500 font-medium mt-0.5 uppercase text-center leading-tight">
                   {brand.description}
                 </span>
               </motion.div>

@@ -42,14 +42,31 @@ export function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20 lg:h-24">
             <Link href="/" className="flex items-center gap-3 group">
-              <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
+              <motion.div
+                whileHover={{ scale: 1.03 }}
+                transition={{ duration: 0.2 }}
+                className={cn(
+                  'transition-all duration-300 rounded-[12px] flex items-center justify-center',
+                  isScrolled
+                    ? 'bg-transparent p-0'
+                    : 'bg-[#06142D]/65 backdrop-blur-md border border-white/[0.08] shadow-sm px-2.5 py-1'
+                )}
+              >
                 <Image
-                  src="/logo.png"
+                  src="/logo_transparent.png"
                   alt="CG Techno Electronics"
-                  width={160}
-                  height={55}
-                  style={{ width: 'auto', height: '48px' }}
-                  className="object-contain"
+                  width={240}
+                  height={152}
+                  className={cn(
+                    'object-contain transition-all duration-300',
+                    isScrolled ? 'h-12 md:h-[58px] lg:h-[68px]' : 'h-[58px] md:h-[68px] lg:h-[82px]'
+                  )}
+                  style={{
+                    width: 'auto',
+                    filter: isScrolled
+                      ? 'none'
+                      : 'brightness(1.20) contrast(1.10) drop-shadow(0 2px 4px rgba(255, 255, 255, 0.06))',
+                  }}
                   priority
                 />
               </motion.div>

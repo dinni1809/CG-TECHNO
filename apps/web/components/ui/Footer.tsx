@@ -12,12 +12,12 @@ export function Footer() {
         <div className="py-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
           <div className="lg:col-span-1">
             <Image
-              src="/logo.png"
+              src="/logo_transparent.png"
               alt="CG Techno Electronics"
-              width={140}
-              height={48}
-              style={{ width: 'auto', height: '40px' }}
-              className="object-contain brightness-0 invert mb-4"
+              width={180}
+              height={114}
+              className="object-contain mb-4 h-16 md:h-20 lg:h-[100px] w-auto transition-all duration-300"
+              style={{ width: 'auto', filter: 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.35))' }}
             />
             <p className="text-xs text-gray-400 leading-relaxed mb-6">
               {siteConfig.tagline}. Premium IT infrastructure and electronics solutions for enterprises across Bengaluru.
