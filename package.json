@@ -13,7 +13,9 @@
       "esbuild",
       "@swc/core",
       "msw",
-      "unrs-resolver"
+      "unrs-resolver",
+      "prisma",
+      "@prisma/engines"
     ]
   },
   "devDependencies": {

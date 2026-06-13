@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ContactSchema } from '@cg-techno/features/schemas';
 import { sendContactEmail } from '@cg-techno/features/email';
 import { checkRateLimit } from '@cg-techno/utils';
+import { prisma } from '@/lib/prisma';
 
 export async function POST(request: NextRequest) {
   try {
@@ -28,6 +29,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const { name, email, phone, message, service, product, company } = parsed.data;
+
+    // 1. Save Enquiry Lead to PostgreSQL database using Prisma
+    await prisma.enquiry.create({
+      data: {
+        fullName: name,
+        email: email,
+        mobile: phone,
+        company: company || null,
+        service: service || product || null,
+        message: message,
+        status: 'NEW',
+      },
+    });
+
+    // 2. Trigger Email Workflows (Admin Alert + Customer Auto Reply)
     await sendContactEmail(parsed.data);
 
     return NextResponse.json(
@@ -37,7 +54,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('[/api/contact] Unhandled error:', error);
     return NextResponse.json(
-      { success: false, error: 'Email service unavailable. Please try again later or contact us directly.' },
+      { success: false, error: 'Service temporarily unavailable. Please try again later or contact us directly.' },
       { status: 500 }
     );
   }

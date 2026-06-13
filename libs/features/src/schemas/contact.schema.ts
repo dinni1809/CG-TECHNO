@@ -22,6 +22,7 @@ export const ContactSchema = z.object({
     .trim(),
   service: z.string().max(100).optional(),
   product: z.string().max(100).optional(),
+  company: z.string().max(100).optional(),
 });
 
 export type ContactPayload = z.infer<typeof ContactSchema>;
