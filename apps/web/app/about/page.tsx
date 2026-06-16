@@ -6,9 +6,30 @@ import { AnimatedSection, StaggerContainer, StaggerItem } from '@/components/ui/
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { CTABanner } from '@/components/sections/CTABanner';
 
+import { JsonLd } from '@/components/SEO/JsonLd';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+
 export const metadata: Metadata = {
   title: 'About Us',
-  description: 'Learn about CG Techno Electronics — Bengaluru\'s trusted IT infrastructure partner with 10+ years of excellence serving 500+ enterprise clients.',
+  description: "Learn about CG Techno Electronics — Bengaluru's trusted IT infrastructure partner with 10+ years of excellence serving 500+ enterprise clients.",
+  keywords: [
+    'About CG Techno',
+    'Enterprise IT Partner Bangalore',
+    'IT Solutions Company Karnataka',
+    'Technology Solutions Bengaluru',
+  ],
+  openGraph: {
+    title: 'About Us | CG Techno Electronics',
+    description: "Learn about CG Techno Electronics — Bengaluru's trusted IT infrastructure partner with 10+ years of excellence serving 500+ enterprise clients.",
+    url: '/about',
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'About CG Techno Electronics' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'About Us | CG Techno Electronics',
+    description: "Learn about CG Techno Electronics — Bengaluru's trusted IT infrastructure partner with 10+ years of excellence serving 500+ enterprise clients.",
+    images: ['/og-image.jpg'],
+  },
 };
 
 const officeImage = 'https://lh3.googleusercontent.com/gps-cs-s/APNQkAEigGmjGNLnTHI2g62hxm5ToTeyFJpNXQLvnNWfeiUd22CJypNp_pVg4E2kcBv8EIP_VRGRKBVOHfsgGgEoJgRRVFv113c3mUAbkJPNmaDylEtHcXz-bJI6g3ieNgXQxXD9XNg=s1360-w1360-h1020-rw';
@@ -21,8 +42,29 @@ const values = [
 ];
 
 export default function AboutPage() {
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    'itemListElement': [
+      {
+        '@type': 'ListItem',
+        'position': 1,
+        'name': 'Home',
+        'item': siteConfig.url,
+      },
+      {
+        '@type': 'ListItem',
+        'position': 2,
+        'name': 'About Us',
+        'item': `${siteConfig.url}/about`,
+      },
+    ],
+  };
+
   return (
     <>
+      <JsonLd schema={breadcrumbSchema} />
+      <Breadcrumbs items={[{ label: 'About Us' }]} />
       {/* 1. About Hero / Company Story */}
       <section className="relative bg-mesh bg-hero-pattern pt-24 pb-12 lg:pt-28 lg:pb-14">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

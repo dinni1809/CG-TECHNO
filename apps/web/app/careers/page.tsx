@@ -4,9 +4,32 @@ import { AnimatedSection, StaggerContainer, StaggerItem } from '@/components/ui/
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { ApplicationForm } from '@/components/sections/ApplicationForm';
 
+import { JsonLd } from '@/components/SEO/JsonLd';
+import { siteConfig } from '@cg-techno/config';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+
 export const metadata: Metadata = {
   title: 'Careers',
   description: 'Join the CG Techno Electronics team. We are always looking for talented professionals, fresh graduates, interns, technicians, and engineers.',
+  keywords: [
+    'Careers at CG Techno',
+    'IT Jobs Bangalore',
+    'Surveillance Engineer Jobs Bengaluru',
+    'Networking Jobs Karnataka',
+    'Hardware Engineering Trainees',
+  ],
+  openGraph: {
+    title: 'Careers | CG Techno Electronics',
+    description: 'Join the CG Techno Electronics team. We are always looking for talented professionals, fresh graduates, interns, technicians, and engineers.',
+    url: '/careers',
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'CG Techno Careers' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Careers | CG Techno Electronics',
+    description: 'Join the CG Techno Electronics team. We are always looking for talented professionals, fresh graduates, interns, technicians, and engineers.',
+    images: ['/og-image.jpg'],
+  },
 };
 
 const companyPerks = [
@@ -43,8 +66,29 @@ const companyPerks = [
 ];
 
 export default function CareersPage() {
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    'itemListElement': [
+      {
+        '@type': 'ListItem',
+        'position': 1,
+        'name': 'Home',
+        'item': siteConfig.url,
+      },
+      {
+        '@type': 'ListItem',
+        'position': 2,
+        'name': 'Careers',
+        'item': `${siteConfig.url}/careers`,
+      },
+    ],
+  };
+
   return (
     <>
+      <JsonLd schema={breadcrumbSchema} />
+      <Breadcrumbs items={[{ label: 'Careers' }]} />
       {/* SECTION 1 — HERO */}
       <section className="relative bg-mesh bg-hero-pattern pt-24 pb-12 lg:pt-28 lg:pb-14 animate-fade-in">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

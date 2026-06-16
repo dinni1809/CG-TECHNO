@@ -15,6 +15,19 @@ const IndustriesEmpowerSection = dynamic(() => import('@/components/sections/Ind
 export const metadata: Metadata = {
   title: siteConfig.seo.defaultTitle,
   description: siteConfig.seo.defaultDescription,
+  keywords: siteConfig.seo.keywords,
+  openGraph: {
+    title: siteConfig.seo.defaultTitle,
+    description: siteConfig.seo.defaultDescription,
+    url: '/',
+    images: [{ url: siteConfig.seo.ogImage, width: 1200, height: 630, alt: siteConfig.name }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: siteConfig.seo.defaultTitle,
+    description: siteConfig.seo.defaultDescription,
+    images: [siteConfig.seo.ogImage],
+  },
 };
 
 export default function HomePage() {

@@ -5,16 +5,57 @@ import { AnimatedSection } from '@/components/ui/AnimatedSection';
 import { ContactForm } from '@/components/sections/ContactForm';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { Suspense } from 'react';
+import { JsonLd } from '@/components/SEO/JsonLd';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Contact Us',
   description: 'Get in touch with CG Techno Electronics. Send an enquiry, request a quote, or visit us at our Bengaluru office.',
+  keywords: [
+    'Contact CG Techno Electronics',
+    'Bangalore IT Support Office',
+    'Technology Quote Bangalore',
+    'Enquire Structured Cabling',
+    'Surveillance System Pricing Bengaluru',
+  ],
+  openGraph: {
+    title: 'Contact Us | CG Techno Electronics',
+    description: 'Get in touch with CG Techno Electronics. Send an enquiry, request a quote, or visit us at our Bengaluru office.',
+    url: '/contact',
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'Contact CG Techno Electronics' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Contact Us | CG Techno Electronics',
+    description: 'Get in touch with CG Techno Electronics. Send an enquiry, request a quote, or visit us at our Bengaluru office.',
+    images: ['/og-image.jpg'],
+  },
 };
 
 export default function ContactPage() {
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    'itemListElement': [
+      {
+        '@type': 'ListItem',
+        'position': 1,
+        'name': 'Home',
+        'item': siteConfig.url,
+      },
+      {
+        '@type': 'ListItem',
+        'position': 2,
+        'name': 'Contact Us',
+        'item': `${siteConfig.url}/contact`,
+      },
+    ],
+  };
 
   return (
     <>
+      <JsonLd schema={breadcrumbSchema} />
+      <Breadcrumbs items={[{ label: 'Contact Us' }]} />
       <section className="relative bg-mesh bg-hero-pattern pt-24 pb-12 lg:pt-28 lg:pb-14">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <AnimatedSection>
