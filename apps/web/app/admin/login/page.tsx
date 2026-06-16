@@ -5,6 +5,7 @@ import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Lock, Mail, Loader2, AlertCircle } from 'lucide-react';
+import { trackAdminLogin } from '@/lib/analytics';
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState('');
@@ -34,6 +35,7 @@ export default function AdminLoginPage() {
         setLoading(false);
       } else {
         console.log('[AdminLogin] Sign in successful, redirecting to /admin/dashboard...');
+        trackAdminLogin();
         router.push('/admin/dashboard');
         router.refresh();
       }

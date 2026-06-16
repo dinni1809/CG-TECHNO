@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Phone } from 'lucide-react';
 import { navLinks, navCTA } from '@cg-techno/config';
 import { cn } from '@cg-techno/utils';
+import { trackPhoneClick, trackCTA } from '@/lib/analytics';
 
 export function Navbar() {
   const pathname = usePathname();
@@ -115,6 +116,7 @@ export function Navbar() {
             <div className="hidden lg:flex items-center gap-6">
               <a
                 href="tel:+918861158888"
+                onClick={() => trackPhoneClick('+91 886 115 8888')}
                 className={cn(
                   'flex items-center gap-2.5 text-base font-semibold transition-colors',
                   isLightNavbar ? 'text-slate-800 hover:text-primary-800' : 'text-white hover:text-white/90'
@@ -127,6 +129,7 @@ export function Navbar() {
                 <Link
                   href={navCTA.href}
                   prefetch={true}
+                  onClick={() => trackCTA(navCTA.label, 'Request Consultation Clicked')}
                   className="px-6 py-3 bg-primary-800 text-white text-base font-semibold rounded-xl hover:bg-primary-700 transition-colors shadow-md hover:shadow-lg"
                 >
                   {navCTA.label}
@@ -183,6 +186,7 @@ export function Navbar() {
               <div className="pt-4 border-t border-white/10 mt-4 space-y-4 px-4 pb-4">
                 <a
                   href="tel:+918861158888"
+                  onClick={() => trackPhoneClick('+91 886 115 8888')}
                   className="flex items-center gap-3 py-2 text-slate-200 hover:text-white font-medium transition-colors"
                 >
                   <Phone size={18} className="text-cyan-400 shrink-0" />
@@ -191,6 +195,7 @@ export function Navbar() {
                 <Link
                   href={navCTA.href}
                   prefetch={true}
+                  onClick={() => trackCTA(navCTA.label, 'Request Consultation Clicked')}
                   className="block w-full py-3.5 text-center bg-primary-800 hover:bg-primary-700 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all text-base"
                 >
                   {navCTA.label}

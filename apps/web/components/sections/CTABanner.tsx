@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Phone } from 'lucide-react';
 import { siteConfig } from '@cg-techno/config';
 import { AnimatedSection } from '../ui/AnimatedSection';
+import { trackPhoneClick, trackCTA } from '@/lib/analytics';
 
 export function CTABanner() {
   return (
@@ -45,6 +46,7 @@ export function CTABanner() {
             <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
               <Link
                 href="/contact"
+                onClick={() => trackCTA('Banner Consultation', 'Request Consultation Clicked')}
                 className="inline-flex items-center gap-2.5 px-10 py-5 bg-white text-primary-900 font-bold rounded-xl shadow-xl hover:shadow-2xl transition-all text-lg"
               >
                 Get Free Consultation
@@ -54,6 +56,7 @@ export function CTABanner() {
             <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
               <a
                 href="tel:+918861158888"
+                onClick={() => trackPhoneClick('+91 886 115 8888')}
                 className="inline-flex items-center gap-2.5 px-10 py-5 border-2 border-white/30 text-white font-bold rounded-xl hover:bg-white/10 transition-all text-lg"
               >
                 <Phone size={20} />

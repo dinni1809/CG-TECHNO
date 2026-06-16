@@ -33,6 +33,7 @@ import {
   type ApplicationPayload
 } from '@cg-techno/features/schemas';
 import { cn } from '@cg-techno/utils';
+import { trackCareerApplication } from '@/lib/analytics';
 
 export function ApplicationForm() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
@@ -133,6 +134,13 @@ export function ApplicationForm() {
 
       const json = await res.json();
       if (json.success) {
+        // Phase 7: Telemetry trackCareerApplication (exclude failed & honeypot submits)
+        trackCareerApplication({
+          qualification: data.qualification,
+          interest: Array.isArray(data.interests) ? data.interests.join(', ') : (data.interests || 'General Interest'),
+          experience: data.experience,
+        });
+
         setStatus('success');
         setSelectedFile(null);
         reset();

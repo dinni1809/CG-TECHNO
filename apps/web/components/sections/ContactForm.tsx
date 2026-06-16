@@ -8,6 +8,7 @@ import { Send, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import { ContactSchema, type ContactPayload } from '@cg-techno/features/schemas';
 import { cn } from '@cg-techno/utils';
 import { useSearchParams } from 'next/navigation';
+import { trackContactSubmission } from '@/lib/analytics';
 
 interface ContactFormProps {
   prefillService?: string;
@@ -79,6 +80,13 @@ function ContactFormInner({ prefillService: propPrefillService }: ContactFormPro
       });
       const json = await res.json();
       if (json.success) {
+        // Phase 6: Telemetry trackContactSubmission (exclude failed & honeypot submits)
+        trackContactSubmission({
+          service: data.service,
+          email: data.email,
+          phone: data.phone,
+        });
+
         setStatus('success');
         reset();
       } else {

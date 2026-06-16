@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Phone, Mail, MapPin, Linkedin, Instagram, Clock } from 'lucide-react';
 import { siteConfig, footerLinks } from '@cg-techno/config';
+import { trackPhoneClick, trackEmailClick } from '@/lib/analytics';
 
 export function Footer() {
   const pathname = usePathname();
@@ -13,6 +14,7 @@ export function Footer() {
   if (pathname?.startsWith('/admin')) {
     return null;
   }
+
 
   return (
     <footer className="bg-gray-950 text-gray-300">
@@ -134,6 +136,7 @@ export function Footer() {
                   <Phone size={14} className="text-primary-400 shrink-0" />
                   <a
                     href={`tel:${phone.replace(/\s/g, '')}`}
+                    onClick={() => trackPhoneClick(phone)}
                     className="text-xs text-gray-400 hover:text-white transition-colors"
                   >
                     {phone}
@@ -144,6 +147,7 @@ export function Footer() {
                 <Mail size={14} className="text-primary-400 shrink-0" />
                 <a
                   href={`mailto:${siteConfig.contactEmail}`}
+                  onClick={() => trackEmailClick(siteConfig.contactEmail)}
                   className="text-xs text-gray-400 hover:text-white transition-colors break-all"
                 >
                   {siteConfig.contactEmail}

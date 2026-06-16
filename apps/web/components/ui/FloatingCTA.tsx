@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import { Phone, MessageSquare } from 'lucide-react';
 import { siteConfig } from '@cg-techno/config';
-
+import { trackPhoneClick, trackWhatsAppClick } from '@/lib/analytics';
 import { usePathname } from 'next/navigation';
 
 export function FloatingCTA() {
@@ -29,6 +29,7 @@ export function FloatingCTA() {
         transition={{ delay: 1, type: 'spring', stiffness: 260, damping: 20 }}
         whileHover={{ scale: 1.1, y: -2 }}
         whileTap={{ scale: 0.9 }}
+        onClick={() => trackWhatsAppClick()}
         className="w-12 h-12 sm:w-14 sm:h-14 bg-emerald-500 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-emerald-600 transition-colors cursor-pointer group relative"
         aria-label="Chat on WhatsApp"
       >
@@ -46,6 +47,7 @@ export function FloatingCTA() {
         transition={{ delay: 1.2, type: 'spring', stiffness: 260, damping: 20 }}
         whileHover={{ scale: 1.1, y: -2 }}
         whileTap={{ scale: 0.9 }}
+        onClick={() => trackPhoneClick(siteConfig.contactPhone[0])}
         className="w-12 h-12 sm:w-14 sm:h-14 bg-primary-600 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-primary-700 transition-colors cursor-pointer group relative"
         aria-label="Call Support"
       >

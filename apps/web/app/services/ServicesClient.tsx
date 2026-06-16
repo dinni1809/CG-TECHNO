@@ -6,6 +6,16 @@ import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { cn } from '@cg-techno/utils';
 import { AnimatedSection, StaggerContainer, StaggerItem } from '@/components/ui/AnimatedSection';
+import { trackCTA, trackServiceInterest } from '@/lib/analytics';
+
+const mapServiceInterestName = (title: string) => {
+  if (title === 'Software & Licensing') return 'Software Licensing';
+  if (title === 'Biometric & Attendance') return 'Biometric Attendance';
+  if (title === 'AMC & Support') return 'AMC Support';
+  if (title === 'Access Automation') return 'Access Automation';
+  return title;
+};
+
 
 export function ServicesClient() {
   const solutionCards = [
@@ -195,6 +205,7 @@ export function ServicesClient() {
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-4">
                   <Link
                     href="/contact"
+                    onClick={() => trackCTA('Request Consultation', 'Request Consultation Clicked')}
                     className="inline-flex items-center justify-center gap-2.5 px-6 h-12 bg-primary-800 hover:bg-primary-750 text-white font-bold rounded-xl shadow-[0_4px_14px_rgba(6,20,45,0.15)] hover:shadow-[0_6px_20px_rgba(6,20,45,0.22)] hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 text-sm"
                   >
                     Request Consultation
@@ -202,6 +213,7 @@ export function ServicesClient() {
                   </Link>
                   <Link
                     href="#services-grid"
+                    onClick={() => trackCTA('Explore Solutions', 'Explore Solutions Clicked')}
                     className="inline-flex items-center justify-center gap-2.5 px-6 h-12 border-2 border-slate-250 text-slate-700 hover:bg-slate-50/50 hover:border-slate-350 hover:scale-[1.01] active:scale-[0.99] font-bold rounded-xl shadow-sm hover:shadow-md transition-all duration-200 text-sm"
                   >
                     Explore Solutions
@@ -241,7 +253,8 @@ export function ServicesClient() {
                     id={card.id}
                     whileHover={{ y: -8 }}
                     transition={{ duration: 0.3, ease: 'easeOut' }}
-                    className="h-full bg-white border border-[#0F172A]/[0.06] rounded-[24px] p-0 shadow-[0_8px_30px_rgba(15,23,42,0.06)] flex flex-col justify-between group scroll-mt-28 overflow-hidden transition-all duration-300 border-t-4 border-primary-800 hover:shadow-[0_20px_45px_rgba(15,23,42,0.12)]"
+                    onClick={() => trackServiceInterest(mapServiceInterestName(card.title))}
+                    className="h-full bg-white border border-[#0F172A]/[0.06] rounded-[24px] p-0 shadow-[0_8px_30px_rgba(15,23,42,0.06)] flex flex-col justify-between group scroll-mt-28 overflow-hidden transition-all duration-300 border-t-4 border-primary-800 hover:shadow-[0_20px_45px_rgba(15,23,42,0.12)] cursor-pointer"
                   >
                     {/* Premium Image Banner */}
                     <div className="relative h-[180px] md:h-[200px] lg:h-[220px] w-full overflow-hidden">
@@ -369,6 +382,7 @@ export function ServicesClient() {
             <div className="flex flex-col sm:flex-row gap-5 justify-center">
               <Link
                 href="/contact"
+                onClick={() => trackCTA('Contact Us', 'Request Consultation Clicked')}
                 className="inline-flex items-center justify-center gap-2.5 px-10 py-5 bg-white text-primary-950 font-bold rounded-xl shadow-xl hover:shadow-2xl transition-all duration-200 text-lg hover:scale-103"
               >
                 Contact Us
@@ -376,6 +390,7 @@ export function ServicesClient() {
               </Link>
               <Link
                 href="/contact?schedule=true"
+                onClick={() => trackCTA('Schedule Consultation', 'Request Consultation Clicked')}
                 className="inline-flex items-center justify-center gap-2.5 px-10 py-5 border-2 border-white/30 hover:border-white text-white font-bold rounded-xl hover:bg-white/10 transition-all duration-200 text-lg hover:scale-103"
               >
                 Schedule Consultation

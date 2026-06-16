@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight, ShieldCheck, Zap, Award } from 'lucide-react';
+import { trackCTA } from '@/lib/analytics';
 
 const trust = [
   { icon: ShieldCheck, label: '10+ Years Experience' },
@@ -75,6 +76,7 @@ export function HeroSection() {
           <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
             <Link
               href="/contact"
+              onClick={() => trackCTA('Get Free Consultation', 'Request Consultation Clicked')}
               className="inline-flex items-center gap-2.5 px-10 py-5 bg-white text-primary-900 font-bold rounded-xl shadow-xl hover:shadow-2xl transition-all duration-200 text-lg"
             >
               Get Free Consultation
@@ -84,6 +86,7 @@ export function HeroSection() {
           <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
             <Link
               href="/services"
+              onClick={() => trackCTA('Explore Services', 'Explore Solutions Clicked')}
               className="inline-flex items-center gap-2.5 px-10 py-5 border-2 border-white/30 text-white font-bold rounded-xl hover:bg-white/10 backdrop-blur-sm transition-all duration-200 text-lg"
             >
               Explore Services
