@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
 import { HeroSection } from '@/components/sections/HeroSection';
 import { PartnerBrands } from '@/components/sections/PartnerBrands';
-import { ServicesSection } from '@/components/sections/ServicesSection';
-import { IndustriesServed } from '@/components/sections/IndustriesServed';
+import { EnterpriseSolutionsShowcase } from '@/components/sections/EnterpriseSolutionsShowcase';
+import { CompletePartnerSection } from '@/components/sections/CompletePartnerSection';
+import { IndustriesEmpowerSection } from '@/components/sections/IndustriesEmpowerSection';
 import { ProjectShowcase } from '@/components/sections/ProjectShowcase';
 import { StatsSection } from '@/components/sections/StatsSection';
 import { CTABanner } from '@/components/sections/CTABanner';
@@ -18,8 +19,9 @@ export default function HomePage() {
     <>
       <HeroSection />
       <PartnerBrands />
-      <ServicesSection compact />
-      <IndustriesServed />
+      <EnterpriseSolutionsShowcase />
+      <CompletePartnerSection />
+      <IndustriesEmpowerSection />
       <ProjectShowcase />
       <StatsSection />
       <CTABanner />

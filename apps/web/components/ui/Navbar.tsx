@@ -10,9 +10,15 @@ import { navLinks, navCTA } from '@cg-techno/config';
 import { cn } from '@cg-techno/utils';
 
 export function Navbar() {
+  const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const pathname = usePathname();
+  const transparentPaths = ['/', '/services', '/about', '/clients', '/careers', '/contact'];
+  const isLightNavbar = isScrolled || !transparentPaths.includes(pathname || '');
+
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -34,20 +40,20 @@ export function Navbar() {
           'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
           isMobileOpen
             ? 'bg-[#06142D] border-b border-white/10 shadow-lg'
-            : isScrolled
-            ? 'bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-100'
+            : isLightNavbar
+            ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-200/50'
             : 'bg-transparent'
         )}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20 lg:h-24">
-            <Link href="/" className="flex items-center gap-3 group">
+            <Link href="/" prefetch={true} className="flex items-center gap-3 group">
               <motion.div
                 whileHover={{ scale: 1.03 }}
                 transition={{ duration: 0.2 }}
                 className={cn(
                   'transition-all duration-300 rounded-[12px] flex items-center justify-center',
-                  isScrolled
+                  isLightNavbar
                     ? 'bg-transparent p-0'
                     : 'bg-[#06142D]/65 backdrop-blur-md border border-white/[0.08] shadow-sm px-2.5 py-1'
                 )}
@@ -55,15 +61,17 @@ export function Navbar() {
                 <Image
                   src="/logo_transparent.png"
                   alt="CG Techno Electronics"
-                  width={240}
-                  height={152}
+                  width={190}
+                  height={120}
                   className={cn(
                     'object-contain transition-all duration-300',
-                    isScrolled ? 'h-12 md:h-[58px] lg:h-[68px]' : 'h-[58px] md:h-[68px] lg:h-[82px]'
+                    isScrolled 
+                      ? 'h-9 md:h-[44px] lg:h-[52px]' 
+                      : 'h-[44px] md:h-[52px] lg:h-[64px]'
                   )}
                   style={{
                     width: 'auto',
-                    filter: isScrolled
+                    filter: isLightNavbar
                       ? 'none'
                       : 'brightness(1.20) contrast(1.10) drop-shadow(0 2px 4px rgba(255, 255, 255, 0.06))',
                   }}
@@ -79,19 +87,23 @@ export function Navbar() {
                   <Link
                     key={link.href}
                     href={link.href}
+                    prefetch={true}
                     className={cn(
                       'relative px-4 py-2.5 text-base font-medium rounded-xl transition-all duration-200 group',
                       isActive
-                        ? 'text-primary-800'
-                        : isScrolled
-                        ? 'text-gray-700 hover:text-primary-800'
+                        ? isLightNavbar
+                          ? 'text-primary-800 font-semibold'
+                          : 'text-white font-semibold'
+                        : isLightNavbar
+                        ? 'text-slate-800 hover:text-primary-800'
                         : 'text-white/90 hover:text-white'
                     )}
                   >
                     {link.label}
                     <span
                       className={cn(
-                        'absolute bottom-0 left-4 right-4 h-0.5 bg-primary-600 rounded-full transition-all duration-200',
+                        'absolute bottom-0 left-4 right-4 h-0.5 rounded-full transition-all duration-200',
+                        isLightNavbar ? 'bg-primary-600' : 'bg-white',
                         isActive ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0 group-hover:opacity-100 group-hover:scale-x-100'
                       )}
                     />
@@ -105,7 +117,7 @@ export function Navbar() {
                 href="tel:+918861158888"
                 className={cn(
                   'flex items-center gap-2.5 text-base font-semibold transition-colors',
-                  isScrolled ? 'text-gray-700 hover:text-primary-750' : 'text-white hover:text-white/90'
+                  isLightNavbar ? 'text-slate-800 hover:text-primary-800' : 'text-white hover:text-white/90'
                 )}
               >
                 <Phone size={18} className="shrink-0" />
@@ -114,6 +126,7 @@ export function Navbar() {
               <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
                 <Link
                   href={navCTA.href}
+                  prefetch={true}
                   className="px-6 py-3 bg-primary-800 text-white text-base font-semibold rounded-xl hover:bg-primary-700 transition-colors shadow-md hover:shadow-lg"
                 >
                   {navCTA.label}
@@ -126,8 +139,8 @@ export function Navbar() {
                 'lg:hidden p-2 rounded-lg transition-colors',
                 isMobileOpen
                   ? 'text-white hover:bg-white/10'
-                  : isScrolled
-                  ? 'text-gray-700 hover:bg-gray-100'
+                  : isLightNavbar
+                  ? 'text-slate-800 hover:bg-slate-100'
                   : 'text-white hover:bg-white/10'
               )}
               onClick={() => setIsMobileOpen(!isMobileOpen)}
@@ -155,6 +168,7 @@ export function Navbar() {
                   <Link
                     key={link.href}
                     href={link.href}
+                    prefetch={true}
                     className={cn(
                       'block py-3 rounded-xl text-base transition-all duration-200',
                       isActive
@@ -176,6 +190,7 @@ export function Navbar() {
                 </a>
                 <Link
                   href={navCTA.href}
+                  prefetch={true}
                   className="block w-full py-3.5 text-center bg-primary-800 hover:bg-primary-700 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all text-base"
                 >
                   {navCTA.label}

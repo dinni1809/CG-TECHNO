@@ -35,6 +35,8 @@ export const metadata: Metadata = {
   },
 };
 
+import { Providers } from './providers';
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
@@ -43,10 +45,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body className="antialiased">
-        <Navbar />
-        <main className="min-h-screen">{children}</main>
-        <Footer />
-        <FloatingCTA />
+        <Providers>
+          <Navbar />
+          <main className="min-h-screen">{children}</main>
+          <Footer />
+          <FloatingCTA />
+        </Providers>
       </body>
     </html>
   );

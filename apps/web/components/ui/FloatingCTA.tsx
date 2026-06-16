@@ -4,7 +4,15 @@ import { motion } from 'framer-motion';
 import { Phone, MessageSquare } from 'lucide-react';
 import { siteConfig } from '@cg-techno/config';
 
+import { usePathname } from 'next/navigation';
+
 export function FloatingCTA() {
+  const pathname = usePathname();
+  
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
+
   const primaryPhone = siteConfig.contactPhone[0].replace(/\s/g, '');
   const whatsappNumber = '918861158888'; // Clean format with country code
   const whatsappMsg = encodeURIComponent('Hello CG Techno, I would like to enquire about your IT infrastructure and electronics solutions.');

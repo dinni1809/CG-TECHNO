@@ -1,23 +1,17 @@
 import type { Metadata } from 'next';
-import { Phone, Mail, MapPin, Clock, MessageSquare } from 'lucide-react';
+import { Phone, Mail, MapPin, Clock, MessageSquare, Loader2 } from 'lucide-react';
 import { siteConfig } from '@cg-techno/config';
 import { AnimatedSection } from '@/components/ui/AnimatedSection';
 import { ContactForm } from '@/components/sections/ContactForm';
 import { SectionHeader } from '@/components/ui/SectionHeader';
+import { Suspense } from 'react';
 
 export const metadata: Metadata = {
   title: 'Contact Us',
   description: 'Get in touch with CG Techno Electronics. Send an enquiry, request a quote, or visit us at our Bengaluru office.',
 };
 
-interface ContactPageProps {
-  searchParams?: Promise<{ service?: string; product?: string }>;
-}
-
-export default async function ContactPage({ searchParams }: ContactPageProps) {
-  const params = await searchParams;
-  const prefillService = params?.service;
-  const prefillProduct = params?.product;
+export default function ContactPage() {
 
   return (
     <>
@@ -156,7 +150,14 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
                     <p className="text-sm text-gray-500">We respond within 24 hours</p>
                   </div>
                 </div>
-                <ContactForm prefillService={prefillService} prefillProduct={prefillProduct} />
+                <Suspense fallback={
+                  <div className="flex flex-col items-center justify-center py-12">
+                    <Loader2 size={36} className="animate-spin text-primary-800 mb-3" />
+                    <p className="text-gray-500 text-sm font-medium">Loading form...</p>
+                  </div>
+                }>
+                  <ContactForm />
+                </Suspense>
               </div>
             </AnimatedSection>
           </div>

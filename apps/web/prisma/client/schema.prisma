@@ -1,0 +1,54 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./client"
+}
+
+model Enquiry {
+  id        String   @id @default(uuid())
+  fullName  String
+  email     String
+  mobile    String
+  company   String?
+  service   String?
+  message   String
+  status    String   @default("NEW")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AdminUser {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  role      String   @default("SUPER_ADMIN")
+  createdAt DateTime @default(now())
+}
+
+model CareerApplication {
+  id                String   @id @default(uuid())
+  fullName          String
+  email             String
+  mobile            String
+  city              String
+  qualification     String
+  fieldOfStudy      String
+  experience        String
+  interests         String[] // PostgreSQL string array
+  preference        String
+  availability      String
+  certifications    String?
+  linkedinUrl       String?
+  portfolioUrl      String?
+  hasDrivingLicense Boolean
+  willingToTravel   Boolean
+  resumeUrl         String
+  additionalInfo    String?
+  status            String   @default("NEW") // NEW, UNDER_REVIEW, SHORTLISTED, INTERVIEW_SCHEDULED, REJECTED, HIRED
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}

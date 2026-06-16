@@ -17,6 +17,15 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
 
+    // 1. Honeypot check
+    if (body.website) {
+      console.log('[Spam Alert] Honeypot field was filled in Contact Form submission.');
+      return NextResponse.json(
+        { success: true, message: 'Submitted successfully' },
+        { status: 200 }
+      );
+    }
+
     const parsed = ContactSchema.safeParse(body);
     if (!parsed.success) {
       const details = parsed.error.errors.map((e) => ({
@@ -31,6 +40,23 @@ export async function POST(request: NextRequest) {
 
     const { name, email, phone, message, service, product, company } = parsed.data;
 
+    // 2. Duplicate submission detection (5-minute window)
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+    const existingEnquiry = await prisma.enquiry.findFirst({
+      where: {
+        email: email,
+        message: message,
+        createdAt: { gte: fiveMinutesAgo },
+      },
+    });
+
+    if (existingEnquiry) {
+      return NextResponse.json(
+        { success: false, error: 'A duplicate enquiry was recently submitted. Please wait a moment.' },
+        { status: 409 }
+      );
+    }
+
     // 1. Save Enquiry Lead to PostgreSQL database using Prisma
     await prisma.enquiry.create({
       data: {
@@ -44,8 +70,10 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // 2. Trigger Email Workflows (Admin Alert + Customer Auto Reply)
-    await sendContactEmail(parsed.data);
+    // 2. Trigger Email Workflows (Admin Alert + Customer Auto Reply) in the background
+    sendContactEmail(parsed.data).catch((emailError) => {
+      console.error('Email workflow failed:', emailError);
+    });
 
     return NextResponse.json(
       { success: true, message: 'Submitted successfully' },

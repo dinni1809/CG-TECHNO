@@ -101,7 +101,7 @@ export function SEOLandingTemplate({
                   <div>
                     <h4 className="font-bold text-base lg:text-lg text-gray-900 mb-1.5 font-heading">OEM Warranties</h4>
                     <p className="text-sm text-gray-500 leading-relaxed">
-                      We supply only genuine products from authorized brand distributors.
+                      We supply and install genuine equipment from authorized brand distributors.
                     </p>
                   </div>
                 </div>

@@ -184,48 +184,53 @@ export async function sendContactEmail(data: ContactPayload): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
   const useResend = apiKey && apiKey !== 're_placeholder_api_key';
 
-  if (useResend) {
-    console.log('Sending emails via Resend API...');
-    
-    // Send Admin Notification Alert
-    await sendViaResend({
-      from: 'CG Techno Website <onboarding@resend.dev>',
-      to: adminEmail,
-      subject: 'New Website Enquiry Received',
-      html: adminHtml,
-      text: `New enquiry from ${data.name} (${data.email}, ${data.phone})\n\nMessage:\n${data.message}\n\nReceived: ${receivedAt}`,
-      replyTo: data.email,
-    });
+  try {
+    if (useResend) {
+      console.log('Sending emails via Resend API...');
+      
+      // Send Admin Notification Alert
+      await sendViaResend({
+        from: 'CG Techno Website <onboarding@resend.dev>',
+        to: adminEmail,
+        subject: 'New Website Enquiry',
+        html: adminHtml,
+        text: `New enquiry from ${data.name} (${data.email}, ${data.phone})\n\nMessage:\n${data.message}\n\nReceived: ${receivedAt}`,
+        replyTo: data.email,
+      });
 
-    // Send Customer Auto-Reply
-    await sendViaResend({
-      from: 'CG Techno Electronics <onboarding@resend.dev>',
-      to: data.email,
-      subject: 'Thank You for Contacting CG Techno',
-      html: customerHtml,
-      text: `Dear ${data.name},\n\nThank you for reaching out to CG Techno Electronics. We have received your enquiry and will respond within 24 business hours.`,
-    });
+      // Send Customer Auto-Reply
+      await sendViaResend({
+        from: 'CG Techno Electronics <onboarding@resend.dev>',
+        to: data.email,
+        subject: 'Enquiry Received – CG Techno',
+        html: customerHtml,
+        text: `Dear ${data.name},\n\nThank you for reaching out to CG Techno Electronics. We have received your enquiry and will respond within 24 business hours.`,
+      });
 
-  } else {
-    console.log('Sending emails via SMTP Transporter...');
-    
-    // Send Admin Notification Alert
-    await transporter.sendMail({
-      from: `"CG Techno Electronics Website" <${process.env.SMTP_USER}>`,
-      to: adminEmail,
-      replyTo: data.email,
-      subject: 'New Website Enquiry Received',
-      html: adminHtml,
-      text: `New enquiry from ${data.name} (${data.email}, ${data.phone})\n\nMessage:\n${data.message}\n\nReceived: ${receivedAt}`,
-    });
+    } else {
+      console.log('Sending emails via SMTP Transporter...');
+      
+      // Send Admin Notification Alert
+      await transporter.sendMail({
+        from: `"CG Techno Electronics Website" <${process.env.SMTP_USER}>`,
+        to: adminEmail,
+        replyTo: data.email,
+        subject: 'New Website Enquiry',
+        html: adminHtml,
+        text: `New enquiry from ${data.name} (${data.email}, ${data.phone})\n\nMessage:\n${data.message}\n\nReceived: ${receivedAt}`,
+      });
 
-    // Send Customer Auto-Reply
-    await transporter.sendMail({
-      from: `"CG Techno Electronics" <${process.env.SMTP_USER}>`,
-      to: data.email,
-      subject: 'Thank You for Contacting CG Techno',
-      html: customerHtml,
-      text: `Dear ${data.name},\n\nThank you for reaching out to CG Techno Electronics. We have received your enquiry and will respond within 24 business hours.`,
-    });
+      // Send Customer Auto-Reply
+      await transporter.sendMail({
+        from: `"CG Techno Electronics" <${process.env.SMTP_USER}>`,
+        to: data.email,
+        subject: 'Enquiry Received – CG Techno',
+        html: customerHtml,
+        text: `Dear ${data.name},\n\nThank you for reaching out to CG Techno Electronics. We have received your enquiry and will respond within 24 business hours.`,
+      });
+    }
+  } catch (error) {
+    console.error('[sendContactEmail] Error sending email via transporter/Resend:', error);
+    throw error;
   }
 }

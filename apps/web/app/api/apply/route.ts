@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ApplicationSchema } from '@cg-techno/features/schemas';
-import { sendApplicationEmail } from '@cg-techno/features/email';
+import { sendApplicationEmails } from '@cg-techno/features';
 import { checkRateLimit } from '@cg-techno/utils';
+import { prisma } from '@/lib/prisma';
+import fs from 'fs';
+import path from 'path';
+import crypto from 'crypto';
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,9 +18,57 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body = await request.json();
+    // Parse multipart form data
+    const formData = await request.formData();
 
-    const parsed = ApplicationSchema.safeParse(body);
+    // 1. Honeypot check
+    const website = formData.get('website') as string | null;
+    if (website) {
+      console.log('[Spam Alert] Honeypot field was filled in Career Application Form.');
+      return NextResponse.json(
+        { success: true, message: 'Application received and saved successfully.' },
+        { status: 200 }
+      );
+    }
+    
+    const fullName = formData.get('fullName') as string;
+    const email = formData.get('email') as string;
+    const mobile = formData.get('mobile') as string;
+    const city = formData.get('city') as string;
+    const qualification = formData.get('qualification') as string;
+    const fieldOfStudy = formData.get('fieldOfStudy') as string;
+    const experience = formData.get('experience') as string;
+    const interests = formData.getAll('interests') as string[];
+    const preference = formData.get('preference') as string;
+    const availability = formData.get('availability') as string;
+    const certifications = (formData.get('certifications') as string | null) || undefined;
+    const linkedinUrl = (formData.get('linkedinUrl') as string | null) || undefined;
+    const portfolioUrl = (formData.get('portfolioUrl') as string | null) || undefined;
+    const hasDrivingLicense = formData.get('hasDrivingLicense') as string;
+    const willingToTravel = formData.get('willingToTravel') as string;
+    const additionalInfo = (formData.get('additionalInfo') as string | null) || undefined;
+    const resume = formData.get('resume') as File | null;
+
+    // Validate textual fields via schema
+    const parsed = ApplicationSchema.safeParse({
+      fullName,
+      email,
+      mobile,
+      city,
+      qualification,
+      fieldOfStudy,
+      experience,
+      interests,
+      preference,
+      availability,
+      certifications,
+      linkedinUrl,
+      portfolioUrl,
+      hasDrivingLicense,
+      willingToTravel,
+      additionalInfo,
+    });
+
     if (!parsed.success) {
       const details = parsed.error.errors.map((e) => ({
         field: String(e.path[0]),
@@ -28,16 +80,117 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    await sendApplicationEmail(parsed.data);
+    // 2. Duplicate submission detection (5-minute window)
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+    const existingApplication = await prisma.careerApplication.findFirst({
+      where: {
+        email: email,
+        createdAt: { gte: fiveMinutesAgo },
+      },
+    });
+
+    if (existingApplication) {
+      return NextResponse.json(
+        { success: false, error: 'You have already submitted an application recently. Please try again later.' },
+        { status: 409 }
+      );
+    }
+
+    // Validate resume file
+    if (!resume || !(resume instanceof File)) {
+      return NextResponse.json(
+        { success: false, error: 'Resume file is required.' },
+        { status: 400 }
+      );
+    }
+
+    if (resume.size > 10 * 1024 * 1024) {
+      return NextResponse.json(
+        { success: false, error: 'Resume file must be smaller than 10MB.' },
+        { status: 400 }
+      );
+    }
+
+    const originalName = resume.name;
+    const extension = originalName.split('.').pop()?.toLowerCase();
+    if (!extension || !['pdf', 'doc', 'docx'].includes(extension)) {
+      return NextResponse.json(
+        { success: false, error: 'Only PDF, DOC, and DOCX files are allowed.' },
+        { status: 400 }
+      );
+    }
+
+    // Store resume securely inside public directory
+    const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'resumes');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+
+    const uniqueFilename = `resume-${Date.now()}-${crypto.randomUUID()}.${extension}`;
+    const localFilePath = path.join(uploadDir, uniqueFilename);
+    const fileBuffer = Buffer.from(await resume.arrayBuffer());
+    await fs.promises.writeFile(localFilePath, fileBuffer);
+
+    // Save record to database using Prisma
+    const appData = parsed.data;
+    const application = await prisma.careerApplication.create({
+      data: {
+        fullName: appData.fullName,
+        email: appData.email,
+        mobile: appData.mobile,
+        city: appData.city,
+        qualification: appData.qualification,
+        fieldOfStudy: appData.fieldOfStudy,
+        experience: appData.experience,
+        interests: appData.interests,
+        preference: appData.preference,
+        availability: appData.availability,
+        certifications: appData.certifications || null,
+        linkedinUrl: appData.linkedinUrl || null,
+        portfolioUrl: appData.portfolioUrl || null,
+        hasDrivingLicense: appData.hasDrivingLicense === 'Yes',
+        willingToTravel: appData.willingToTravel === 'Yes',
+        resumeUrl: `/uploads/resumes/${uniqueFilename}`,
+        additionalInfo: appData.additionalInfo || null,
+        status: 'NEW',
+      },
+    });
+
+    // Send emails (confirmation to applicant and notification to admin) in the background
+    sendApplicationEmails(
+      {
+        fullName: appData.fullName,
+        email: appData.email,
+        mobile: appData.mobile,
+        city: appData.city,
+        qualification: appData.qualification,
+        fieldOfStudy: appData.fieldOfStudy,
+        experience: appData.experience,
+        interests: appData.interests,
+        preference: appData.preference,
+        availability: appData.availability,
+        certifications: appData.certifications || null,
+        linkedinUrl: appData.linkedinUrl || null,
+        portfolioUrl: appData.portfolioUrl || null,
+        hasDrivingLicense: appData.hasDrivingLicense === 'Yes',
+        willingToTravel: appData.willingToTravel === 'Yes',
+        additionalInfo: appData.additionalInfo || null,
+        resumeUrl: `/uploads/resumes/${uniqueFilename}`,
+      },
+      localFilePath,
+      originalName
+    ).catch((emailError) => {
+      console.error('[/api/apply] Gracefully caught email sending failure:', emailError);
+    });
 
     return NextResponse.json(
-      { success: true, message: 'Application received successfully' },
+      { success: true, message: 'Application received and saved successfully.' },
       { status: 200 }
     );
   } catch (error) {
     console.error('[/api/apply] Unhandled error:', error);
     return NextResponse.json(
-      { success: false, error: 'Email service unavailable. Please try again later or contact us directly.' },
+      { success: false, error: 'Internal server error. Please try again later.' },
       { status: 500 }
     );
   }
