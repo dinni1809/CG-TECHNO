@@ -21,7 +21,8 @@ import {
   Trash2,
   Archive,
   Check,
-  CheckSquare
+  CheckSquare,
+  AlertCircle
 } from 'lucide-react';
 
 interface Enquiry {
@@ -60,12 +61,8 @@ export function EnquiryManager({ initialEnquiries }: EnquiryManagerProps) {
   const statuses = [
     { value: 'NEW', label: 'New' },
     { value: 'CONTACTED', label: 'Contacted' },
-    { value: 'NEGOTIATION', label: 'Follow Up' },
-    { value: 'QUOTATION_SENT', label: 'Quotation Sent' },
-    { value: 'WON', label: 'Closed (Won)' },
-    { value: 'LOST', label: 'Closed (Lost)' },
-    { value: 'CLOSED', label: 'Closed' },
-    { value: 'ARCHIVED', label: 'Archived' }
+    { value: 'RESOLVED', label: 'Resolved' },
+    { value: 'SPAM', label: 'Spam' }
   ];
 
   // Helper to map DB status to friendly UI name
@@ -73,6 +70,8 @@ export function EnquiryManager({ initialEnquiries }: EnquiryManagerProps) {
     switch (status) {
       case 'NEW': return 'New';
       case 'CONTACTED': return 'Contacted';
+      case 'RESOLVED': return 'Resolved';
+      case 'SPAM': return 'Spam';
       case 'NEGOTIATION': return 'Follow Up';
       case 'QUOTATION_SENT': return 'Quotation Sent';
       case 'WON': return 'Closed (Won)';
@@ -87,9 +86,13 @@ export function EnquiryManager({ initialEnquiries }: EnquiryManagerProps) {
   function getStatusClasses(status: string) {
     switch (status) {
       case 'NEW':
-        return 'text-amber-700 bg-amber-50 border-amber-200';
-      case 'CONTACTED':
         return 'text-blue-700 bg-blue-50 border-blue-200';
+      case 'CONTACTED':
+        return 'text-amber-700 bg-amber-50 border-amber-200';
+      case 'RESOLVED':
+        return 'text-emerald-700 bg-emerald-50 border-emerald-200';
+      case 'SPAM':
+        return 'text-rose-700 bg-rose-50 border-rose-200';
       case 'NEGOTIATION':
         return 'text-purple-700 bg-purple-50 border-purple-200';
       case 'QUOTATION_SENT':
@@ -118,13 +121,11 @@ export function EnquiryManager({ initialEnquiries }: EnquiryManagerProps) {
 
   // CSV Exporter
   function exportCSV() {
-    const headers = ['Name', 'Email', 'Phone', 'Company', 'Service', 'Message', 'Status', 'Date Submitted'];
+    const headers = ['Name', 'Email', 'Mobile', 'Message', 'Status', 'Created Date'];
     const rows = filteredEnquiries.map(e => [
       e.fullName,
       e.email,
       e.mobile,
-      e.company || 'N/A',
-      e.service || 'General',
       e.message.replace(/"/g, '""'),
       getStatusLabel(e.status),
       e.createdAt.toLocaleString('en-IN')
@@ -259,14 +260,13 @@ export function EnquiryManager({ initialEnquiries }: EnquiryManagerProps) {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full pl-10 pr-8 py-2.5 bg-white border border-gray-300 rounded-xl text-sm font-semibold text-gray-700 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="w-full pl-10 pr-8 py-2.5 bg-white border border-gray-300 rounded-xl text-sm font-semibold text-gray-700 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               <option value="ALL">All Statuses</option>
               <option value="NEW">New</option>
               <option value="CONTACTED">Contacted</option>
-              <option value="NEGOTIATION">Follow Up</option>
-              <option value="QUOTATION_SENT">Quotation Sent</option>
-              <option value="CLOSED">Closed (Won/Lost)</option>
+              <option value="RESOLVED">Resolved</option>
+              <option value="SPAM">Spam</option>
             </select>
             <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
               <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -592,18 +592,26 @@ export function EnquiryManager({ initialEnquiries }: EnquiryManagerProps) {
                 <button
                   onClick={() => handleStatusUpdate(selectedLead.id, 'CONTACTED')}
                   disabled={updatingId === selectedLead.id}
-                  className="flex items-center gap-1.5 px-3 py-2.5 text-xs font-bold border border-blue-200 text-blue-800 bg-blue-50 hover:bg-blue-100 rounded-xl transition-all shadow-sm disabled:opacity-50"
+                  className="flex items-center gap-1.5 px-3 py-2.5 text-xs font-bold border border-amber-250 text-amber-800 bg-amber-50 hover:bg-amber-100 rounded-xl transition-all shadow-sm disabled:opacity-50"
                 >
                   <Check size={14} />
                   Mark Contacted
                 </button>
                 <button
-                  onClick={() => handleStatusUpdate(selectedLead.id, 'CLOSED')}
+                  onClick={() => handleStatusUpdate(selectedLead.id, 'RESOLVED')}
                   disabled={updatingId === selectedLead.id}
-                  className="flex items-center gap-1.5 px-3 py-2.5 text-xs font-bold border border-emerald-200 text-emerald-800 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition-all shadow-sm disabled:opacity-50"
+                  className="flex items-center gap-1.5 px-3 py-2.5 text-xs font-bold border border-emerald-250 text-emerald-800 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition-all shadow-sm disabled:opacity-50"
                 >
                   <CheckSquare size={14} />
-                  Mark Closed
+                  Mark Resolved
+                </button>
+                <button
+                  onClick={() => handleStatusUpdate(selectedLead.id, 'SPAM')}
+                  disabled={updatingId === selectedLead.id}
+                  className="flex items-center gap-1.5 px-3 py-2.5 text-xs font-bold border border-rose-250 text-rose-800 bg-rose-50 hover:bg-rose-100 rounded-xl transition-all shadow-sm disabled:opacity-50"
+                >
+                  <AlertCircle size={14} className="text-rose-600" />
+                  Mark Spam
                 </button>
                 <button 
                   onClick={() => setSelectedLead(null)}

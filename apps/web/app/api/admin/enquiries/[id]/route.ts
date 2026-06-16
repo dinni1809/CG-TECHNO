@@ -13,7 +13,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     const { id } = params;
     const { status } = await request.json();
 
-    const allowedStatuses = ['NEW', 'CONTACTED', 'QUOTATION_SENT', 'NEGOTIATION', 'WON', 'LOST', 'ARCHIVED', 'CLOSED'];
+    const allowedStatuses = ['NEW', 'CONTACTED', 'QUOTATION_SENT', 'NEGOTIATION', 'WON', 'LOST', 'ARCHIVED', 'CLOSED', 'RESOLVED', 'SPAM'];
     if (!allowedStatuses.includes(status)) {
       return NextResponse.json({ success: false, error: 'Invalid status' }, { status: 400 });
     }

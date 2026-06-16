@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -38,6 +38,14 @@ export function ApplicationForm() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (status === 'success' || status === 'error') {
+      containerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [status]);
 
   const form = useForm<any>({
     resolver: zodResolver(ApplicationSchema),
@@ -231,7 +239,8 @@ export function ApplicationForm() {
       </div>
 
       {/* Form or Success Screen */}
-      {status === 'success' ? (
+      <div ref={containerRef} className="w-full">
+        {status === 'success' ? (
         <motion.div
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -717,6 +726,9 @@ export function ApplicationForm() {
                   </>
                 )}
               </motion.button>
+              <p className="text-[11px] text-gray-400 text-center mt-3 leading-relaxed max-w-md mx-auto font-medium">
+                ℹ️ Applications are reviewed by our recruitment team. Complete profiles receive faster review.
+              </p>
             </div>
           </div>
 
@@ -785,8 +797,12 @@ export function ApplicationForm() {
               })}
             </div>
           </div>
+          <p className="text-center text-xs text-gray-400 mt-8">
+            All applications are subject to our standard recruitment and data privacy policies.
+          </p>
         </form>
       )}
+      </div>
     </div>
   );
 }
