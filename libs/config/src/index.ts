@@ -7,8 +7,6 @@ export type { NavLink } from './navigation';
 export { services } from './data/services.data';
 export type { Service } from './data/services.data';
 
-export { products, productCategories } from './data/products.data';
-export type { Product, ProductCategory } from './data/products.data';
 
 export { clients, industries } from './data/clients.data';
 export type { Client } from './data/clients.data';

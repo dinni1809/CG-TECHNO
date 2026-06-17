@@ -1,9 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  distDir: process.env.BUILD_DIR || '.next',
   transpilePackages: ['@cg-techno/config', '@cg-techno/utils', '@cg-techno/features'],
   images: {
     formats: ['image/webp'],
-    remotePatterns: [],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+    ],
   },
   async headers() {
     return [
@@ -20,3 +26,5 @@ const nextConfig = {
 };
 
 module.exports = nextConfig;
+// Force dev server reload comment v4
+

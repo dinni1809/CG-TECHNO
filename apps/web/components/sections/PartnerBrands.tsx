@@ -38,22 +38,27 @@ export function PartnerBrands() {
               <motion.div
                 key={`${brand.name}-${i}`}
                 whileHover={{ scale: 1.05 }}
-                className="flex flex-col items-center justify-center bg-white border border-gray-100/80 rounded-xl px-8 py-4 min-w-[180px] shadow-sm hover:shadow-md transition-shadow cursor-default"
+                className="group flex flex-col items-center justify-between bg-white border border-gray-100/80 rounded-2xl p-5 w-[220px] h-[160px] shadow-sm hover:shadow-md transition-all cursor-default select-none shrink-0"
               >
-                <div className="relative w-[140px] h-12 flex items-center justify-center">
+                <div className="w-full h-[70px] flex items-center justify-center bg-slate-50/50 rounded-lg p-2.5 transition-colors duration-300 group-hover:bg-slate-100/60">
                   <Image
                     src={`/logos/${brand.name.toLowerCase()}.svg`}
                     alt={`${brand.name} Logo`}
-                    fill
-                    className="object-contain"
+                    width={180}
+                    height={70}
+                    className="max-h-[70px] max-w-[180px] object-contain transition-transform duration-350"
+                    priority={i < 5}
+                    loading={i >= 5 ? "lazy" : undefined}
                   />
                 </div>
-                <span className="text-xs font-medium text-slate-800 mt-2 tracking-tight">
-                  {brand.name}
-                </span>
-                <span className="text-[9px] text-gray-500 font-medium mt-0.5 uppercase text-center leading-tight">
-                  {brand.description}
-                </span>
+                <div className="flex flex-col items-center justify-center mt-2.5 w-full">
+                  <span className="text-xs font-bold text-slate-800 tracking-tight group-hover:text-primary-800 transition-colors duration-250">
+                    {brand.name}
+                  </span>
+                  <span className="text-[9px] text-gray-500 font-semibold mt-0.5 uppercase text-center leading-tight line-clamp-1 w-full">
+                    {brand.description}
+                  </span>
+                </div>
               </motion.div>
             ))}
           </div>

@@ -1,14 +1,34 @@
 import type { Metadata } from 'next';
-import { clients, industries } from '@cg-techno/config';
+import { clients, industries, siteConfig } from '@cg-techno/config';
 import { Users } from 'lucide-react';
 import { AnimatedSection, StaggerContainer, StaggerItem } from '@/components/ui/AnimatedSection';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { ProjectShowcase } from '@/components/sections/ProjectShowcase';
 import { CTABanner } from '@/components/sections/CTABanner';
+import { JsonLd } from '@/components/SEO/JsonLd';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Our Clients',
   description: 'CG Techno Electronics proudly serves 500+ enterprise clients including government agencies, IT companies, hospitals, and banks across Karnataka.',
+  keywords: [
+    'CG Techno Clients',
+    'Enterprise IT Customers Bangalore',
+    'Government IT Contractor Karnataka',
+    'Hospital Infrastructure Projects',
+  ],
+  openGraph: {
+    title: 'Our Clients | CG Techno Electronics',
+    description: 'CG Techno Electronics proudly serves 500+ enterprise clients including government agencies, IT companies, hospitals, and banks across Karnataka.',
+    url: '/clients',
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'CG Techno Client Base' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Our Clients | CG Techno Electronics',
+    description: 'CG Techno Electronics proudly serves 500+ enterprise clients including government agencies, IT companies, hospitals, and banks across Karnataka.',
+    images: ['/og-image.jpg'],
+  },
 };
 
 const industryColors: Record<string, string> = {
@@ -19,8 +39,29 @@ const industryColors: Record<string, string> = {
 };
 
 export default function ClientsPage() {
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    'itemListElement': [
+      {
+        '@type': 'ListItem',
+        'position': 1,
+        'name': 'Home',
+        'item': siteConfig.url,
+      },
+      {
+        '@type': 'ListItem',
+        'position': 2,
+        'name': 'Our Clients',
+        'item': `${siteConfig.url}/clients`,
+      },
+    ],
+  };
+
   return (
     <>
+      <JsonLd schema={breadcrumbSchema} />
+      <Breadcrumbs items={[{ label: 'Our Clients' }]} />
       <section className="relative bg-mesh bg-hero-pattern pt-24 pb-12 lg:pt-28 lg:pb-14">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <AnimatedSection>

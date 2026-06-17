@@ -59,3 +59,11 @@ apps/web/.next/
 .env.production
 .env.staging
 .env*.local
+
+# Resume Uploads
+apps/web/public/uploads/resumes/
+dummy_resume.docx
+
+# Prisma Generated Client
+apps/web/prisma/client/
+*.dll.node

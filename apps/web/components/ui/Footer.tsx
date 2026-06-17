@@ -1,10 +1,20 @@
+'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { Phone, Mail, MapPin, Linkedin, Instagram, Clock } from 'lucide-react';
 import { siteConfig, footerLinks } from '@cg-techno/config';
+import { trackPhoneClick, trackEmailClick } from '@/lib/analytics';
 
 export function Footer() {
+  const pathname = usePathname();
   const year = new Date().getFullYear();
+
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
+
 
   return (
     <footer className="bg-gray-950 text-gray-300">
@@ -85,21 +95,21 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Products & Certifications */}
+          {/* Solutions & Certifications */}
           <div>
-            <h3 className="text-white font-semibold text-xs uppercase tracking-wider mb-5">Products & Certs</h3>
+            <h3 className="text-white font-semibold text-xs uppercase tracking-wider mb-5">Solutions</h3>
             <ul className="space-y-3">
               <li>
-                <Link href="/products" className="text-xs text-gray-400 hover:text-white transition-colors duration-200">Enterprise Servers & Racks</Link>
+                <Link href="/services" className="text-xs text-gray-400 hover:text-white transition-colors duration-200">Solutions</Link>
               </li>
               <li>
-                <Link href="/products" className="text-xs text-gray-400 hover:text-white transition-colors duration-200">Laptops & Workstations</Link>
+                <Link href="/services#industries-served" className="text-xs text-gray-400 hover:text-white transition-colors duration-200">Industries Served</Link>
               </li>
               <li>
-                <Link href="/products" className="text-xs text-gray-400 hover:text-white transition-colors duration-200">Switches, Routers & Firewalls</Link>
+                <Link href="/services#electronics-engineering" className="text-xs text-gray-400 hover:text-white transition-colors duration-200">Technology Consulting</Link>
               </li>
               <li>
-                <Link href="/products" className="text-xs text-gray-400 hover:text-white transition-colors duration-200">CCTV & Surveillance Tech</Link>
+                <Link href="/services#enterprise-it" className="text-xs text-gray-400 hover:text-white transition-colors duration-200">Infrastructure Services</Link>
               </li>
               <li className="pt-3 border-t border-gray-800">
                 <span className="text-[10px] font-bold text-cyan-300 block uppercase tracking-wider">Certifications</span>
@@ -126,6 +136,7 @@ export function Footer() {
                   <Phone size={14} className="text-primary-400 shrink-0" />
                   <a
                     href={`tel:${phone.replace(/\s/g, '')}`}
+                    onClick={() => trackPhoneClick(phone)}
                     className="text-xs text-gray-400 hover:text-white transition-colors"
                   >
                     {phone}
@@ -136,6 +147,7 @@ export function Footer() {
                 <Mail size={14} className="text-primary-400 shrink-0" />
                 <a
                   href={`mailto:${siteConfig.contactEmail}`}
+                  onClick={() => trackEmailClick(siteConfig.contactEmail)}
                   className="text-xs text-gray-400 hover:text-white transition-colors break-all"
                 >
                   {siteConfig.contactEmail}
