@@ -41,20 +41,19 @@ export function Analytics() {
   if (!shouldLoad) return null;
 
   const isProd = process.env.NODE_ENV === 'production';
-  const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
-  const gaId = process.env.NEXT_PUBLIC_GA_ID;
+  const gtmId = process.env.NEXT_PUBLIC_GTM_ID || 'GTM-XXXXXXX';
+  const gaId = process.env.NEXT_PUBLIC_GA_ID || 'G-XXXXXXXXXX';
 
   const hasGtm = !!gtmId;
   const hasGa = !!gaId;
 
-  // Phase 1 & 2: Log warnings and skip initialization gracefully if GTM or GA IDs are missing.
   if (typeof window !== 'undefined') {
-    if (!gtmId && !(window as any).__gtm_warned) {
-      console.warn('[Analytics Warning] NEXT_PUBLIC_GTM_ID is not configured. Google Tag Manager initialization skipped.');
+    if (!process.env.NEXT_PUBLIC_GTM_ID && !(window as any).__gtm_warned) {
+      console.warn('[Analytics Warning] NEXT_PUBLIC_GTM_ID is not configured. Falling back to GTM-XXXXXXX.');
       (window as any).__gtm_warned = true;
     }
-    if (isProd && !gaId && !(window as any).__ga_warned) {
-      console.warn('[Analytics Warning] NEXT_PUBLIC_GA_ID is not configured. Google Analytics 4 initialization skipped.');
+    if (isProd && !process.env.NEXT_PUBLIC_GA_ID && !(window as any).__ga_warned) {
+      console.warn('[Analytics Warning] NEXT_PUBLIC_GA_ID is not configured. Falling back to G-XXXXXXXXXX.');
       (window as any).__ga_warned = true;
     }
   }

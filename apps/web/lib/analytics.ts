@@ -71,6 +71,18 @@ export function pushEvent(params: CommonEventParams): void {
 }
 
 /**
+ * Track page views
+ */
+export function trackPageView(): void {
+  if (typeof window === 'undefined') return;
+  pushEvent({
+    event_name: 'Page View',
+    page_path: window.location.pathname,
+    timestamp: new Date().toISOString(),
+  });
+}
+
+/**
  * Track successful Contact Form Submissions (Phase 6)
  */
 export function trackContactSubmission(details: { service?: string; email: string; phone: string }): void {
