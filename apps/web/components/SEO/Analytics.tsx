@@ -1,10 +1,17 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import Script from 'next/script';
+import { trackPageView } from '@/lib/analytics';
 
 export function Analytics() {
   const [shouldLoad, setShouldLoad] = useState(false);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    trackPageView();
+  }, [pathname]);
 
   useEffect(() => {
     // Phase 3: Load after scroll, click, touchstart, mousemove, keydown, or 4 seconds fallback.
