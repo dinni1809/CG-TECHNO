@@ -79,12 +79,12 @@ function ContactFormInner({ prefillService: propPrefillService }: ContactFormPro
         body: JSON.stringify({ ...data, website }),
       });
       const json = await res.json();
-      if (json.success) {
-        // Phase 6: Telemetry trackContactSubmission (exclude failed & honeypot submits)
+      if (json.success === true) {
+        const { email, phone, service } = data;
         trackContactSubmission({
-          service: data.service,
-          email: data.email,
-          phone: data.phone,
+          email,
+          phone,
+          service,
         });
 
         setStatus('success');

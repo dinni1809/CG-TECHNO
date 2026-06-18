@@ -133,12 +133,13 @@ export function ApplicationForm() {
       });
 
       const json = await res.json();
-      if (json.success) {
-        // Phase 7: Telemetry trackCareerApplication (exclude failed & honeypot submits)
+      if (json.success === true) {
+        const { qualification, experience } = data;
+        const position = Array.isArray(data.interests) ? data.interests.join(', ') : (data.interests || 'General Interest');
         trackCareerApplication({
-          qualification: data.qualification,
-          interest: Array.isArray(data.interests) ? data.interests.join(', ') : (data.interests || 'General Interest'),
-          experience: data.experience,
+          position,
+          qualification,
+          experience,
         });
 
         setStatus('success');
