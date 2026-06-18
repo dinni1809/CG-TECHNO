@@ -14,7 +14,7 @@ export function Navbar() {
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const transparentPaths = ['/', '/services', '/about', '/clients', '/careers', '/contact'];
+  const transparentPaths = ['/'];
   const isLightNavbar = isScrolled || !transparentPaths.includes(pathname || '');
 
   if (pathname?.startsWith('/admin')) {
