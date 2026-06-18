@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { name, email, phone, message, service, product, company } = parsed.data;
+    const { name, email, phone, message, service, product, company, subject } = parsed.data;
 
     // 2. Duplicate submission detection (5-minute window)
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
@@ -64,7 +64,8 @@ export async function POST(request: NextRequest) {
         email: email,
         mobile: phone,
         company: company || null,
-        service: service || product || null,
+        service: service || 'General Enquiry',
+        subject: subject || null,
         message: message,
         status: 'NEW',
       },

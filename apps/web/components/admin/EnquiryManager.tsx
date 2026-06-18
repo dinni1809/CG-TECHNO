@@ -32,6 +32,7 @@ interface Enquiry {
   mobile: string;
   company: string | null;
   service: string | null;
+  subject: string | null;
   message: string;
   status: string;
   createdAt: Date;
@@ -121,11 +122,14 @@ export function EnquiryManager({ initialEnquiries }: EnquiryManagerProps) {
 
   // CSV Exporter
   function exportCSV() {
-    const headers = ['Name', 'Email', 'Mobile', 'Message', 'Status', 'Created Date'];
+    const headers = ['Name', 'Email', 'Mobile', 'Company', 'Service', 'Subject', 'Message', 'Status', 'Created Date'];
     const rows = filteredEnquiries.map(e => [
       e.fullName,
       e.email,
       e.mobile,
+      (e.company || '').replace(/"/g, '""'),
+      (e.service || 'General Enquiry').replace(/"/g, '""'),
+      (e.subject || '').replace(/"/g, '""'),
       e.message.replace(/"/g, '""'),
       getStatusLabel(e.status),
       e.createdAt.toLocaleString('en-IN')
@@ -198,7 +202,10 @@ export function EnquiryManager({ initialEnquiries }: EnquiryManagerProps) {
     const matchesSearch = 
       lead.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       lead.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      lead.mobile.includes(searchQuery);
+      lead.mobile.includes(searchQuery) ||
+      (lead.company?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
+      (lead.service?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
+      (lead.subject?.toLowerCase() || '').includes(searchQuery.toLowerCase());
 
     let matchesStatus = true;
     if (statusFilter !== 'ALL') {
@@ -300,6 +307,7 @@ export function EnquiryManager({ initialEnquiries }: EnquiryManagerProps) {
                     <tr className="bg-slate-50 border-b border-gray-200 text-xs font-bold text-gray-550 uppercase tracking-wider">
                       <th className="p-4 pl-6">Lead Name</th>
                       <th className="p-4">Service Required</th>
+                      <th className="p-4">Subject</th>
                       <th className="p-4">Message Snippet</th>
                       <th className="p-4">Lead Status</th>
                       <th className="p-4">Date</th>
@@ -331,9 +339,16 @@ export function EnquiryManager({ initialEnquiries }: EnquiryManagerProps) {
                             {lead.service || 'General Enquiry'}
                           </span>
                         </td>
-
+ 
+                        {/* Subject Column */}
+                        <td className="p-4 max-w-[150px]">
+                          <p className="text-xs font-semibold text-gray-700 truncate">
+                            {lead.subject || <span className="text-gray-400 italic font-normal">N/A</span>}
+                          </p>
+                        </td>
+ 
                         {/* Message Column */}
-                        <td className="p-4 max-w-[280px]">
+                        <td className="p-4 max-w-[240px]">
                           <p className="text-xs text-gray-550 leading-relaxed truncate">
                             {lead.message}
                           </p>
@@ -417,6 +432,12 @@ export function EnquiryManager({ initialEnquiries }: EnquiryManagerProps) {
                       <Briefcase size={13} className="text-gray-400 shrink-0" />
                       <span className="font-medium text-gray-700">{lead.service || 'General Enquiry'}</span>
                     </div>
+                    {lead.subject && (
+                      <div className="flex items-center gap-2 text-xs text-gray-650">
+                        <Inbox size={13} className="text-gray-400 shrink-0" />
+                        <span className="font-semibold text-gray-700">Sub: {lead.subject}</span>
+                      </div>
+                    )}
                     <div className="flex items-center gap-2 text-xs text-gray-500 font-mono">
                       <Clock size={13} className="text-gray-400 shrink-0" />
                       <span>{lead.createdAt.toLocaleString('en-IN')}</span>
@@ -528,10 +549,26 @@ export function EnquiryManager({ initialEnquiries }: EnquiryManagerProps) {
                 </div>
 
                 <div className="p-3 border border-gray-150 rounded-xl space-y-1">
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-gray-400 block">Company Name</span>
+                  <span className="text-sm font-semibold text-gray-900 flex items-center gap-1.5 pt-0.5">
+                    <Building size={14} className="text-gray-400 shrink-0" />
+                    {selectedLead.company || <span className="text-gray-400 italic font-normal">Not Provided</span>}
+                  </span>
+                </div>
+
+                <div className="p-3 border border-gray-150 rounded-xl space-y-1">
                   <span className="text-[10px] uppercase font-bold tracking-wider text-gray-400 block">Service of Interest</span>
                   <span className="text-sm font-semibold text-gray-900 flex items-center gap-1.5 pt-0.5">
                     <Briefcase size={14} className="text-gray-400 shrink-0" />
                     {selectedLead.service || 'General Enquiry'}
+                  </span>
+                </div>
+ 
+                <div className="p-3 border border-gray-150 rounded-xl space-y-1">
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-gray-400 block">Subject</span>
+                  <span className="text-sm font-semibold text-gray-900 flex items-center gap-1.5 pt-0.5">
+                    <Inbox size={14} className="text-gray-400 shrink-0" />
+                    {selectedLead.subject || <span className="text-gray-400 italic font-normal">Not Provided</span>}
                   </span>
                 </div>
 

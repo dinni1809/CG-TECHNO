@@ -14,7 +14,8 @@ model Enquiry {
   email     String
   mobile    String
   company   String?
-  service   String?
+  service   String   @default("General Enquiry")
+  subject   String?
   message   String
   status    String   @default("NEW")
   createdAt DateTime @default(now())
