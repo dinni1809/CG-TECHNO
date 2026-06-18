@@ -7,7 +7,7 @@ import { ContactInfo } from '@/components/sections/ContactInfo';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { Suspense } from 'react';
 import { JsonLd } from '@/components/SEO/JsonLd';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { HeroCTA } from '@/components/ui/HeroCTA';
 
 
 export const metadata: Metadata = {
@@ -57,7 +57,6 @@ export default function ContactPage() {
   return (
     <>
       <JsonLd schema={breadcrumbSchema} />
-      <Breadcrumbs items={[{ label: 'Contact Us' }]} />
       <section className="relative bg-mesh bg-hero-pattern pt-24 pb-12 lg:pt-28 lg:pb-14">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <AnimatedSection>
@@ -71,10 +70,13 @@ export default function ContactPage() {
                 IT Solutions
               </span>
             </h1>
-            <p className="text-white/70 text-lg sm:text-xl max-w-4xl mx-auto leading-relaxed">
+            <p className="text-white/70 text-lg sm:text-xl max-w-4xl mx-auto leading-relaxed mb-8">
               Ready to transform your IT infrastructure? Our team is available Monday–Saturday
               to discuss your requirements and provide a custom solution.
             </p>
+            <div className="flex justify-center">
+              <HeroCTA href="#contact-form" label="Contact Our Team" />
+            </div>
           </AnimatedSection>
         </div>
       </section>
@@ -89,7 +91,7 @@ export default function ContactPage() {
             description="Have a query about structured cabling, CCTV installation, server solutions, or AMC? Fill out the form or reach out directly to our offices."
             className="mb-16 text-center"
           />
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-16 lg:gap-20">
+          <div id="contact-form" className="grid grid-cols-1 lg:grid-cols-5 gap-16 lg:gap-20">
             <AnimatedSection direction="left" className="lg:col-span-2 space-y-8">
               <div>
                 <h2 className="text-3xl font-bold text-gray-900 mb-3 font-heading">Contact Information</h2>

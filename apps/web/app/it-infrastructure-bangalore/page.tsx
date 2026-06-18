@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { SEOLandingTemplate } from '@/components/sections/SEOLandingTemplate';
 import { JsonLd } from '@/components/SEO/JsonLd';
 import { siteConfig } from '@cg-techno/config';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'IT Infrastructure Solutions Bangalore | Corporate IT Office Setup',
@@ -51,7 +50,6 @@ export default function ITInfrastructureBangalore() {
   return (
     <>
       <JsonLd schema={breadcrumbSchema} />
-      <Breadcrumbs items={[{ label: 'IT Infrastructure Bangalore' }]} />
       <SEOLandingTemplate
         titlePrefix="Premium Enterprise"
         titleHighlight="IT Infrastructure Solutions Bangalore"

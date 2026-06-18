@@ -6,7 +6,7 @@ import { ApplicationForm } from '@/components/sections/ApplicationForm';
 
 import { JsonLd } from '@/components/SEO/JsonLd';
 import { siteConfig } from '@cg-techno/config';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { HeroCTA } from '@/components/ui/HeroCTA';
 
 export const metadata: Metadata = {
   title: 'Careers',
@@ -88,7 +88,6 @@ export default function CareersPage() {
   return (
     <>
       <JsonLd schema={breadcrumbSchema} />
-      <Breadcrumbs items={[{ label: 'Careers' }]} />
       {/* SECTION 1 — HERO */}
       <section className="relative bg-mesh bg-hero-pattern pt-24 pb-12 lg:pt-28 lg:pb-14 animate-fade-in">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -102,9 +101,12 @@ export default function CareersPage() {
               Build Infrastructure.<br />
               Build Your Future.
             </h1>
-            <p className="text-white/70 text-lg max-w-3xl mx-auto leading-relaxed">
+            <p className="text-white/70 text-lg max-w-3xl mx-auto leading-relaxed mb-8">
               Join a team that delivers enterprise technology, networking, security, automation, software licensing, and electronics solutions across businesses, institutions, and industries.
             </p>
+            <div className="flex justify-center">
+              <HeroCTA href="#apply" label="Apply Now" actionName="Apply Now Clicked" />
+            </div>
           </AnimatedSection>
         </div>
       </section>
