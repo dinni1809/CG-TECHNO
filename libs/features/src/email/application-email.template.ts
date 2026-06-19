@@ -68,7 +68,11 @@ export async function sendApplicationEmails(
   const receivedAt = formatDate(new Date());
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || 'http://localhost:3000';
-  const resumeLink = data.resumeUrl ? `${baseUrl}${data.resumeUrl}` : `${baseUrl}/uploads/resumes/${resumeOriginalName}`;
+  const resumeLink = data.resumeUrl
+    ? (data.resumeUrl.startsWith('http://') || data.resumeUrl.startsWith('https://')
+        ? data.resumeUrl
+        : `${baseUrl}${data.resumeUrl}`)
+    : `${baseUrl}/uploads/resumes/${resumeOriginalName}`;
 
   // 1. Admin Email Notification Body
   const adminHtml = `

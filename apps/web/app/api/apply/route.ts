@@ -3,8 +3,7 @@ import { ApplicationSchema } from '@cg-techno/features/schemas';
 import { sendCareerConfirmation, sendCareerAdminNotification } from '@/src/lib/email/resend';
 import { checkRateLimit } from '@cg-techno/utils';
 import { prisma } from '@/lib/prisma';
-import fs from 'fs';
-import path from 'path';
+import { put } from '@vercel/blob';
 import crypto from 'crypto';
 
 export async function POST(request: NextRequest) {
@@ -120,16 +119,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Store resume securely inside public directory
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'resumes');
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
+    // Upload file to Vercel Blob permanent cloud storage
+    let resumeUrl = '';
+    try {
+      const fileBuffer = Buffer.from(await resume.arrayBuffer());
+      const uniqueFilename = `resumes/resume-${Date.now()}-${crypto.randomUUID()}.${extension}`;
+      const blob = await put(uniqueFilename, fileBuffer, {
+        access: 'public',
+        contentType: resume.type || 'application/pdf',
+      });
+      resumeUrl = blob.url;
+      console.log('[/api/apply] Successfully uploaded resume to Vercel Blob:', resumeUrl);
+    } catch (blobError) {
+      console.error('[/api/apply] Vercel Blob upload failed:', blobError);
+      return NextResponse.json(
+        { success: false, error: 'Failed to upload resume to cloud storage. Please check connection and try again.' },
+        { status: 500 }
+      );
     }
-
-    const uniqueFilename = `resume-${Date.now()}-${crypto.randomUUID()}.${extension}`;
-    const localFilePath = path.join(uploadDir, uniqueFilename);
-    const fileBuffer = Buffer.from(await resume.arrayBuffer());
-    await fs.promises.writeFile(localFilePath, fileBuffer);
 
     // Save record to database using Prisma
     const appData = parsed.data;
@@ -150,7 +157,7 @@ export async function POST(request: NextRequest) {
         portfolioUrl: appData.portfolioUrl || null,
         hasDrivingLicense: appData.hasDrivingLicense === 'Yes',
         willingToTravel: appData.willingToTravel === 'Yes',
-        resumeUrl: `/uploads/resumes/${uniqueFilename}`,
+        resumeUrl: resumeUrl,
         additionalInfo: appData.additionalInfo || null,
         status: 'NEW',
       },
@@ -175,7 +182,7 @@ export async function POST(request: NextRequest) {
           resumeOriginalName: originalName,
           timestamp: new Date(),
         },
-        localFilePath
+        resumeUrl
       );
     } catch (emailError) {
       // Error is already logged as 'Email delivery failed' inside the service function

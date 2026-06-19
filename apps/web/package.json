@@ -14,7 +14,8 @@
     "@cg-techno/utils": "workspace:*",
     "@hookform/resolvers": "^3.10.0",
     "@prisma/client": "^5.20.0",
-    "bcrypt": "^6.0.0",
+    "@vercel/blob": "^0.23.4",
+    "bcryptjs": "^2.4.3",
     "clsx": "catalog:",
     "framer-motion": "catalog:",
     "lucide-react": "catalog:",
@@ -29,7 +30,7 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@types/bcrypt": "^6.0.0",
+    "@types/bcryptjs": "^2.4.6",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",

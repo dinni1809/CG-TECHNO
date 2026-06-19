@@ -150,9 +150,20 @@ export async function sendCareerAdminNotification(
     const adminRecipients = getAdminEmails();
 
     const attachments: Array<{ filename: string; content: Buffer }> = [];
-    if (resumeLocalPath && fs.existsSync(resumeLocalPath)) {
+    if (resumeLocalPath) {
       try {
-        const fileContent = fs.readFileSync(resumeLocalPath);
+        let fileContent: Buffer;
+        if (resumeLocalPath.startsWith('http://') || resumeLocalPath.startsWith('https://')) {
+          const res = await fetch(resumeLocalPath);
+          if (!res.ok) {
+            throw new Error(`Failed to fetch file from Blob storage: ${res.statusText}`);
+          }
+          fileContent = Buffer.from(await res.arrayBuffer());
+        } else if (fs.existsSync(resumeLocalPath)) {
+          fileContent = fs.readFileSync(resumeLocalPath);
+        } else {
+          throw new Error('File path does not exist');
+        }
         attachments.push({
           filename: data.resumeOriginalName || 'resume.pdf',
           content: fileContent,
