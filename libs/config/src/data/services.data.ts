@@ -16,13 +16,13 @@ export const services: Service[] = [
   {
     id: 'enterprise-it',
     title: 'Enterprise IT Infrastructure',
-    shortDescription: 'Build reliable and scalable IT foundations for growing businesses.',
-    longDescription: 'We design, deploy, and maintain enterprise-grade IT infrastructure solutions. From structured cabling to server setups and hardware procurement, our certified engineers ensure your technology backbone is robust, highly secure, and optimized for maximum efficiency.',
+    shortDescription: 'Build reliable, secure, and scalable IT foundations with expert server management and infrastructure setup.',
+    longDescription: 'We design, deploy, and maintain enterprise-grade IT infrastructure solutions with a strong focus on Server Management and hardware optimization. From physical server installation, Active Directory configuration, and patching to robust data center setups, our certified engineers ensure your technology backbone is secure, scalable, and optimized for maximum operational efficiency.',
     icon: 'Server',
     features: [
       'IT Infrastructure Setup',
-      'Server Installation',
-      'Server Management',
+      'Server Installation & Config',
+      'Active Server Management',
       'Data Center Solutions',
       'Hardware Procurement',
       'IT AMC Services',
@@ -37,15 +37,15 @@ export const services: Service[] = [
   {
     id: 'software-licensing',
     title: 'Software & Licensing Solutions',
-    shortDescription: 'Authorized licensing and software deployment solutions for businesses of all sizes.',
-    longDescription: 'Ensure compliance and reduce software costs. As authorized licensing partners, we provide procurement, consulting, and seamless deployment of Microsoft licensing, corporate operating systems, virtualization software, and security tools tailored to your operational size.',
+    shortDescription: 'Procure and manage Microsoft 365, Azure, AWS, and secure cloud software licensing.',
+    longDescription: 'Ensure compliance and optimize software spend. As authorized partners, we deliver enterprise cloud solutions and licensing for Microsoft 365, Microsoft Azure, and AWS Cloud. We manage seamless cloud infrastructure provisioning, secure data migration, legacy email migration, and automated backup solutions tailored to your organization\'s security and scale requirements.',
     icon: 'Cloud',
     features: [
-      'Microsoft Licensing',
-      'Microsoft 365',
-      'Windows Server Licensing',
-      'Enterprise Software Procurement',
-      'Security Licensing',
+      'Microsoft 365 & Office',
+      'Azure & AWS Cloud Solutions',
+      'Secure Data Migration',
+      'Legacy Email Migration',
+      'Automated Backup Solutions',
       'Compliance Consulting'
     ],
     ctaLabel: 'Consult Software Expert',
@@ -178,8 +178,8 @@ export const services: Service[] = [
   {
     id: 'amc-support',
     title: 'Annual Maintenance & Support',
-    shortDescription: 'Long-term support and maintenance to ensure maximum uptime.',
-    longDescription: 'Ensure operations never halt. Our comprehensive and non-comprehensive Annual Maintenance Contracts (AMC) offer regular health checkups, scheduled preventive cleanings, fast emergency response windows, and dedicated remote helpdesk engineers.',
+    shortDescription: 'Maximize uptime and business continuity with professional IT AMC services.',
+    longDescription: 'Keep your IT operations running smoothly with our dedicated AMC Services. We provide comprehensive and non-comprehensive Annual Maintenance Contracts (AMC) that feature regular system health checkups, scheduled preventive cleanings, rapid remote helpdesk support, and fast on-site emergency troubleshooting response to guarantee maximum uptime.',
     icon: 'BriefcaseBusiness',
     features: [
       'Preventive Maintenance',

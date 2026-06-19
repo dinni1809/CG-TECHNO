@@ -22,19 +22,19 @@ export function ServicesClient() {
     {
       id: 'enterprise-it',
       title: 'IT Infrastructure',
-      desc: 'Servers, storage, networking, deployment, upgrades, and enterprise-scale infrastructure management.',
+      desc: 'Comprehensive server setup, active server management, data center solutions, and enterprise-scale physical and virtual infrastructure deployment.',
       image: '/images/services/it-infrastructure.jpg',
     },
     {
       id: 'software-licensing',
       title: 'Software & Licensing',
-      desc: 'Microsoft Licensing, Microsoft 365, enterprise software procurement, compliance, and deployment.',
+      desc: 'Authorized Microsoft 365, Microsoft Azure, and AWS Cloud licensing, cloud solutions setup, secure data migration, and seamless email migration.',
       image: '/images/services/software-licensing.jpg',
     },
     {
       id: 'security-surveillance',
       title: 'Security Systems',
-      desc: 'CCTV, surveillance, monitoring systems, access control, and enterprise security infrastructure.',
+      desc: 'Commercial CCTV surveillance networks, video analytics, access control gates, and robust cyber security integrations for enterprise endpoints.',
       image: '/images/services/security-systems.jpg',
     },
     {
@@ -70,7 +70,7 @@ export function ServicesClient() {
     {
       id: 'amc-support',
       title: 'AMC & Support',
-      desc: 'Preventive maintenance, remote support, on-site service, and long-term technical assistance.',
+      desc: 'Professional AMC services offering 24/7 remote helpdesk, rapid on-site troubleshooting, scheduled preventive care, and business backup solutions.',
       image: '/images/services/amc-support.jpg',
     },
   ];
@@ -123,9 +123,21 @@ export function ServicesClient() {
               <p className="text-white/80 text-sm sm:text-base leading-relaxed font-sans">
                 CG Techno provides complete technology, networking, security, licensing, automation, infrastructure, electronics integration, and support solutions for businesses of every size.
               </p>
-              <p className="text-cyan-300 font-bold text-sm sm:text-base tracking-wide font-sans">
+              <p className="text-cyan-300 font-bold text-sm sm:text-base tracking-wide font-sans mb-8">
                 One Partner. Every Technology Requirement.
               </p>
+            </div>
+
+            <div className="mt-8 flex justify-center">
+              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                <Link
+                  href="/contact"
+                  onClick={() => trackCTA('Get Free Consultation', 'Request Consultation Clicked')}
+                  className="inline-flex items-center gap-2.5 px-8 py-4 bg-white text-primary-950 font-bold rounded-xl shadow-lg hover:bg-slate-50 transition-all text-base"
+                >
+                  Get Free Consultation
+                </Link>
+              </motion.div>
             </div>
           </AnimatedSection>
         </div>

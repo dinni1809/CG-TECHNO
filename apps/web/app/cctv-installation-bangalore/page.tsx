@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { SEOLandingTemplate } from '@/components/sections/SEOLandingTemplate';
 import { JsonLd } from '@/components/SEO/JsonLd';
 import { siteConfig } from '@cg-techno/config';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'CCTV Installation & Commercial Surveillance Bangalore',
@@ -51,7 +50,6 @@ export default function CCTVInstallationBangalore() {
   return (
     <>
       <JsonLd schema={breadcrumbSchema} />
-      <Breadcrumbs items={[{ label: 'CCTV Installation Bangalore' }]} />
       <SEOLandingTemplate
         titlePrefix="Professional HD"
         titleHighlight="CCTV Installation & Commercial Surveillance Bangalore"

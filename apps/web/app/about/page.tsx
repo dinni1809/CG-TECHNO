@@ -7,7 +7,7 @@ import { SectionHeader } from '@/components/ui/SectionHeader';
 import { CTABanner } from '@/components/sections/CTABanner';
 
 import { JsonLd } from '@/components/SEO/JsonLd';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { HeroCTA } from '@/components/ui/HeroCTA';
 
 export const metadata: Metadata = {
   title: 'About Us',
@@ -64,7 +64,6 @@ export default function AboutPage() {
   return (
     <>
       <JsonLd schema={breadcrumbSchema} />
-      <Breadcrumbs items={[{ label: 'About Us' }]} />
       {/* 1. About Hero / Company Story */}
       <section className="relative bg-mesh bg-hero-pattern pt-24 pb-12 lg:pt-28 lg:pb-14">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -78,10 +77,12 @@ export default function AboutPage() {
                 CG Techno
               </span>
             </h1>
-            <p className="text-white/70 text-lg sm:text-xl max-w-4xl mx-auto leading-relaxed">
-              A decade of building the digital backbone of Bengaluru&apos;s enterprises —
-              one network, one server, one solution at a time.
+            <p className="text-white/70 text-lg sm:text-xl max-w-4xl mx-auto leading-relaxed mb-8">
+              CG Techno Electronics is a trusted IT solutions provider helping organizations modernize infrastructure, secure business operations, and manage cloud environments through expert consulting, managed services, cybersecurity solutions, and enterprise technology support.
             </p>
+            <div className="flex justify-center">
+              <HeroCTA href="/contact" label="Request Consultation" />
+            </div>
           </AnimatedSection>
         </div>
       </section>

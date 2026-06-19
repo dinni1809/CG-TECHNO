@@ -1,4 +1,4 @@
-export { ContactSchema } from './contact.schema';
+export { ContactSchema, SERVICE_OPTIONS } from './contact.schema';
 export type { ContactPayload } from './contact.schema';
 
 export {

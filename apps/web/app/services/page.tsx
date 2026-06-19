@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { ServicesClient } from './ServicesClient';
 import { JsonLd } from '@/components/SEO/JsonLd';
 import { siteConfig } from '@cg-techno/config';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Complete Technology & Electronics Solutions Services',
@@ -52,7 +51,6 @@ export default function ServicesPage() {
   return (
     <>
       <JsonLd schema={breadcrumbSchema} />
-      <Breadcrumbs items={[{ label: 'Services' }]} />
       <ServicesClient />
     </>
   );

@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { SEOLandingTemplate } from '@/components/sections/SEOLandingTemplate';
 import { JsonLd } from '@/components/SEO/JsonLd';
 import { siteConfig } from '@cg-techno/config';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Laptop & Desktop Rental Services Bangalore',
@@ -51,7 +50,6 @@ export default function LaptopRentalBangalore() {
   return (
     <>
       <JsonLd schema={breadcrumbSchema} />
-      <Breadcrumbs items={[{ label: 'Laptop Rental Bangalore' }]} />
       <SEOLandingTemplate
         titlePrefix="Bulk Corporate"
         titleHighlight="Laptop & Desktop Rental Services Bangalore"

@@ -6,7 +6,7 @@ import { SectionHeader } from '@/components/ui/SectionHeader';
 import { ProjectShowcase } from '@/components/sections/ProjectShowcase';
 import { CTABanner } from '@/components/sections/CTABanner';
 import { JsonLd } from '@/components/SEO/JsonLd';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { HeroCTA } from '@/components/ui/HeroCTA';
 
 export const metadata: Metadata = {
   title: 'Our Clients',
@@ -61,7 +61,6 @@ export default function ClientsPage() {
   return (
     <>
       <JsonLd schema={breadcrumbSchema} />
-      <Breadcrumbs items={[{ label: 'Our Clients' }]} />
       <section className="relative bg-mesh bg-hero-pattern pt-24 pb-12 lg:pt-28 lg:pb-14">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <AnimatedSection>
@@ -75,10 +74,13 @@ export default function ClientsPage() {
                 500+ Enterprises
               </span>
             </h1>
-            <p className="text-white/70 text-lg sm:text-xl max-w-4xl mx-auto leading-relaxed">
+            <p className="text-white/70 text-lg sm:text-xl max-w-4xl mx-auto leading-relaxed mb-8">
               From government bodies to IT companies and hospitals — organizations across Karnataka
               trust CG Techno Electronics for their critical IT infrastructure.
             </p>
+            <div className="flex justify-center">
+              <HeroCTA href="/contact" label="Partner With Us" />
+            </div>
           </AnimatedSection>
         </div>
       </section>

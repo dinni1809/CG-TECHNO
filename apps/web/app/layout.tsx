@@ -115,21 +115,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <JsonLd schema={globalSchema} />
       </head>
       <body className="antialiased">
-        {process.env.NEXT_PUBLIC_GTM_ID && (
-          <noscript>
-            <iframe
-              src={`https://www.googletagmanager.com/ns.html?id=${process.env.NEXT_PUBLIC_GTM_ID}`}
-              height="0"
-              width="0"
-              style={{ display: 'none', visibility: 'hidden' }}
-            />
-          </noscript>
-        )}
+        <noscript>
+          <iframe
+            src={`https://www.googletagmanager.com/ns.html?id=${process.env.NEXT_PUBLIC_GTM_ID || 'GTM-XXXXXXX'}`}
+            height="0"
+            width="0"
+            style={{ display: 'none', visibility: 'hidden' }}
+          />
+        </noscript>
         <Analytics />
         <Providers>
-          <Navbar />
-          <main className="min-h-screen">{children}</main>
-          <Footer />
+          <div className="relative min-h-screen flex flex-col">
+            <Navbar />
+            <div className="flex-1 flex flex-col">
+              <main className="flex-grow">{children}</main>
+            </div>
+            <Footer />
+          </div>
           <FloatingCTA />
         </Providers>
       </body>

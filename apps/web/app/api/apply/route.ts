@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ApplicationSchema } from '@cg-techno/features/schemas';
-import { sendApplicationEmails } from '@cg-techno/features';
+import { sendCareerConfirmation, sendCareerAdminNotification } from '@/src/lib/email/resend';
 import { checkRateLimit } from '@cg-techno/utils';
 import { prisma } from '@/lib/prisma';
 import fs from 'fs';
@@ -156,32 +156,30 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Send emails (confirmation to applicant and notification to admin) in the background
-    sendApplicationEmails(
-      {
-        fullName: appData.fullName,
-        email: appData.email,
-        mobile: appData.mobile,
-        city: appData.city,
-        qualification: appData.qualification,
-        fieldOfStudy: appData.fieldOfStudy,
-        experience: appData.experience,
-        interests: appData.interests,
-        preference: appData.preference,
-        availability: appData.availability,
-        certifications: appData.certifications || null,
-        linkedinUrl: appData.linkedinUrl || null,
-        portfolioUrl: appData.portfolioUrl || null,
-        hasDrivingLicense: appData.hasDrivingLicense === 'Yes',
-        willingToTravel: appData.willingToTravel === 'Yes',
-        additionalInfo: appData.additionalInfo || null,
-        resumeUrl: `/uploads/resumes/${uniqueFilename}`,
-      },
-      localFilePath,
-      originalName
-    ).catch((emailError) => {
-      console.error('[/api/apply] Gracefully caught email sending failure:', emailError);
-    });
+    // Send emails (confirmation to applicant and notification to admin)
+    try {
+      await sendCareerConfirmation(appData.email, appData.fullName);
+    } catch (emailError) {
+      // Error is already logged as 'Email delivery failed' inside the service function
+    }
+
+    try {
+      await sendCareerAdminNotification(
+        {
+          name: appData.fullName,
+          email: appData.email,
+          phone: appData.mobile,
+          qualification: appData.qualification,
+          experience: appData.experience,
+          interests: appData.interests,
+          resumeOriginalName: originalName,
+          timestamp: new Date(),
+        },
+        localFilePath
+      );
+    } catch (emailError) {
+      // Error is already logged as 'Email delivery failed' inside the service function
+    }
 
     return NextResponse.json(
       { success: true, message: 'Application received and saved successfully.' },

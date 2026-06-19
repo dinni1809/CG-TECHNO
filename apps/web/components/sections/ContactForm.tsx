@@ -4,8 +4,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
-import { ContactSchema, type ContactPayload } from '@cg-techno/features/schemas';
+import { Send, CheckCircle2, AlertCircle, Loader2, ChevronDown } from 'lucide-react';
+import { ContactSchema, SERVICE_OPTIONS, type ContactPayload } from '@cg-techno/features/schemas';
 import { cn } from '@cg-techno/utils';
 import { useSearchParams } from 'next/navigation';
 import { trackContactSubmission } from '@/lib/analytics';
@@ -17,7 +17,15 @@ interface ContactFormProps {
 function ContactFormInner({ prefillService: propPrefillService }: ContactFormProps) {
   const searchParams = useSearchParams();
   const queryPrefillService = searchParams ? searchParams.get('service') || '' : '';
-  const prefillService = propPrefillService || queryPrefillService;
+  let prefillService = propPrefillService || queryPrefillService;
+
+  if (prefillService) {
+    if (prefillService === 'Rental & Lease') {
+      prefillService = 'Laptop Rental';
+    } else if (prefillService === 'CCTV & Surveillance') {
+      prefillService = 'CCTV Installation';
+    }
+  }
 
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
@@ -38,7 +46,10 @@ function ContactFormInner({ prefillService: propPrefillService }: ContactFormPro
   } = useForm<ContactPayload>({
     resolver: zodResolver(ContactSchema),
     defaultValues: {
-      service: prefillService || '',
+      service: (prefillService as any) || '',
+      company: '',
+      subject: '',
+      consent: false,
       product: '',
       message: prefillService
         ? `I am interested in your ${prefillService} service. Please provide more details.`
@@ -49,7 +60,10 @@ function ContactFormInner({ prefillService: propPrefillService }: ContactFormPro
   useEffect(() => {
     if (prefillService) {
       reset({
-        service: prefillService,
+        service: prefillService as any,
+        company: '',
+        subject: '',
+        consent: false,
         product: '',
         message: `I am interested in your ${prefillService} service. Please provide more details.`,
       });
@@ -79,12 +93,12 @@ function ContactFormInner({ prefillService: propPrefillService }: ContactFormPro
         body: JSON.stringify({ ...data, website }),
       });
       const json = await res.json();
-      if (json.success) {
-        // Phase 6: Telemetry trackContactSubmission (exclude failed & honeypot submits)
+      if (json.success === true) {
+        const { email, phone, service } = data;
         trackContactSubmission({
-          service: data.service,
-          email: data.email,
-          phone: data.phone,
+          email,
+          phone,
+          service,
         });
 
         setStatus('success');
@@ -177,32 +191,66 @@ function ContactFormInner({ prefillService: propPrefillService }: ContactFormPro
               </div>
             </div>
 
-            <div>
-              <label className="form-label">Mobile Number *</label>
-              <input
-                {...register('phone')}
-                type="tel"
-                placeholder="9876543210"
-                className={cn('input-field', errors.phone && 'input-error')}
-                autoComplete="tel"
-                maxLength={10}
-              />
-              {errors.phone && <p className="form-error">{errors.phone.message}</p>}
-              <p className="text-xs text-gray-400 mt-1">10-digit Indian mobile number (starts with 6–9)</p>
+            {/* Row 2: Mobile Number & Company Name */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <label className="form-label">Mobile Number *</label>
+                <input
+                  {...register('phone')}
+                  type="tel"
+                  placeholder="9876543210"
+                  className={cn('input-field', errors.phone && 'input-error')}
+                  autoComplete="tel"
+                  maxLength={10}
+                />
+                {errors.phone && <p className="form-error">{errors.phone.message}</p>}
+                <p className="text-xs text-gray-400 mt-1">10-digit Indian mobile number (starts with 6–9)</p>
+              </div>
+              <div>
+                <label className="form-label">Company Name <span className="text-gray-400 font-normal">(Optional)</span></label>
+                <input
+                  {...register('company')}
+                  type="text"
+                  placeholder="CG Techno Electronics"
+                  className={cn('input-field', errors.company && 'input-error')}
+                />
+                {errors.company && <p className="form-error">{errors.company.message}</p>}
+              </div>
             </div>
 
-            {prefillService && (
-              <div>
-                <label className="form-label">Service of Interest</label>
-                <input
+            {/* Row 3: Service dropdown (full width) */}
+            <div>
+              <label className="form-label">Service Interested In *</label>
+              <div className="relative">
+                <select
                   {...register('service')}
-                  type="text"
-                  readOnly
-                  className="input-field bg-gray-50 cursor-not-allowed"
-                />
+                  className={cn('input-field appearance-none pr-10', errors.service && 'input-error')}
+                >
+                  <option value="">Select a service...</option>
+                  {SERVICE_OPTIONS.map((opt) => (
+                    <option key={opt} value={opt}>
+                      {opt}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
               </div>
-            )}
+              {errors.service && <p className="form-error">{errors.service.message}</p>}
+            </div>
 
+            {/* Row 4: Subject (full width) */}
+            <div>
+              <label className="form-label">Subject <span className="text-gray-400 font-normal">(Optional)</span></label>
+              <input
+                {...register('subject')}
+                type="text"
+                placeholder="Bulk enquiry, support ticket request, etc."
+                className={cn('input-field', errors.subject && 'input-error')}
+              />
+              {errors.subject && <p className="form-error">{errors.subject.message}</p>}
+            </div>
+
+            {/* Row 5: Message (full width) */}
             <div>
               <label className="form-label">Message *</label>
               <textarea
@@ -212,6 +260,22 @@ function ContactFormInner({ prefillService: propPrefillService }: ContactFormPro
                 className={cn('input-field resize-none', errors.message && 'input-error')}
               />
               {errors.message && <p className="form-error">{errors.message.message}</p>}
+            </div>
+
+            {/* Row 6: Consent checkbox (full width) */}
+            <div className="flex flex-col gap-2 py-1">
+              <div className="flex items-start gap-2.5">
+                <input
+                  {...register('consent')}
+                  id="consent"
+                  type="checkbox"
+                  className="w-4 h-4 mt-1 border-gray-300 text-primary-800 focus:ring-primary-750 rounded cursor-pointer shrink-0"
+                />
+                <label htmlFor="consent" className="text-xs sm:text-sm text-gray-500 leading-normal select-none cursor-pointer">
+                  I agree to the privacy policy and consent to CG Techno Electronics contacting me regarding this enquiry. *
+                </label>
+              </div>
+              {errors.consent && <p className="form-error -mt-1">{errors.consent.message}</p>}
             </div>
 
             <AnimatePresence>
