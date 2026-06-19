@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ContactSchema } from '@cg-techno/features/schemas';
-import { sendContactEmail } from '@cg-techno/features/email';
+import { sendContactConfirmation, sendContactAdminNotification } from '@/src/lib/email/resend';
 import { checkRateLimit } from '@cg-techno/utils';
 import { prisma } from '@/lib/prisma';
 
@@ -71,10 +71,27 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // 2. Trigger Email Workflows (Admin Alert + Customer Auto Reply) in the background
-    sendContactEmail(parsed.data).catch((emailError) => {
-      console.error('Email workflow failed:', emailError);
-    });
+    // 2. Trigger Email Workflows (Admin Alert + Customer Auto Reply)
+    try {
+      await sendContactConfirmation(email, name, service || 'General Enquiry');
+    } catch (emailError) {
+      // Error is already logged as 'Email delivery failed' inside the service function
+    }
+
+    try {
+      await sendContactAdminNotification({
+        name,
+        email,
+        phone,
+        company: company || undefined,
+        service: service || undefined,
+        subject: subject || undefined,
+        message,
+        timestamp: new Date(),
+      });
+    } catch (emailError) {
+      // Error is already logged as 'Email delivery failed' inside the service function
+    }
 
     return NextResponse.json(
       { success: true, message: 'Submitted successfully' },
