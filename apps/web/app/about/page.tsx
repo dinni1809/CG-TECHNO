@@ -78,8 +78,7 @@ export default function AboutPage() {
               </span>
             </h1>
             <p className="text-white/70 text-lg sm:text-xl max-w-4xl mx-auto leading-relaxed mb-8">
-              A decade of building the digital backbone of Bengaluru&apos;s enterprises —
-              one network, one server, one solution at a time.
+              CG Techno Electronics is a trusted IT solutions provider helping organizations modernize infrastructure, secure business operations, and manage cloud environments through expert consulting, managed services, cybersecurity solutions, and enterprise technology support.
             </p>
             <div className="flex justify-center">
               <HeroCTA href="/contact" label="Request Consultation" />

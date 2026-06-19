@@ -2,6 +2,11 @@ import type { Metadata } from 'next';
 import dynamic from 'next/dynamic';
 import { HeroSection } from '@/components/sections/HeroSection';
 import { CompletePartnerSection } from '@/components/sections/CompletePartnerSection';
+import { TechnologyExpertise } from '@/components/sections/TechnologyExpertise';
+import { ManagedITServices } from '@/components/sections/ManagedITServices';
+import { SecurityCompliance } from '@/components/sections/SecurityCompliance';
+import { BusinessOutcomes } from '@/components/sections/BusinessOutcomes';
+import { TechnologyPartners } from '@/components/sections/TechnologyPartners';
 import { ProjectShowcase } from '@/components/sections/ProjectShowcase';
 import { StatsSection } from '@/components/sections/StatsSection';
 import { CTABanner } from '@/components/sections/CTABanner';
@@ -37,6 +42,11 @@ export default function HomePage() {
       <PartnerBrands />
       <EnterpriseSolutionsShowcase />
       <CompletePartnerSection />
+      <TechnologyExpertise />
+      <ManagedITServices />
+      <SecurityCompliance />
+      <BusinessOutcomes />
+      <TechnologyPartners />
       <IndustriesEmpowerSection />
       <ProjectShowcase />
       <StatsSection />
