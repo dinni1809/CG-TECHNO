@@ -120,6 +120,17 @@ export async function POST(request: NextRequest) {
     }
 
     // Upload file to Vercel Blob permanent cloud storage
+    const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
+    const isMockBlobToken = !blobToken || blobToken.startsWith('vercel_blob_rw_mock') || blobToken.includes('mock') || blobToken.includes('placeholder');
+
+    if (isMockBlobToken) {
+      console.error('[/api/apply] Resume upload failed: BLOB_READ_WRITE_TOKEN is not configured or is a placeholder.');
+      return NextResponse.json(
+        { success: false, error: 'Resume upload storage is not configured. Please contact support or configure BLOB_READ_WRITE_TOKEN.' },
+        { status: 503 }
+      );
+    }
+
     let resumeUrl = '';
     try {
       const fileBuffer = Buffer.from(await resume.arrayBuffer());
