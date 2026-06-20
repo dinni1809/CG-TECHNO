@@ -103,9 +103,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (resume.size > 10 * 1024 * 1024) {
+    if (resume.size > 4 * 1024 * 1024) {
       return NextResponse.json(
-        { success: false, error: 'Resume file must be smaller than 10MB.' },
+        { success: false, error: 'Resume file must be smaller than 4MB.' },
         { status: 400 }
       );
     }
