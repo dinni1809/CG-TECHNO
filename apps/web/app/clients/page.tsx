@@ -94,7 +94,7 @@ export default function ClientsPage() {
               { industry: 'Healthcare', count: '80+', color: 'bg-emerald-50 text-emerald-700 border-emerald-100' },
               { industry: 'Banking', count: '60+', color: 'bg-amber-50 text-amber-700 border-amber-100' },
             ].map((item) => (
-              <div key={item.industry} className={`rounded-3xl p-8 text-center border shadow-sm ${item.color}`}>
+              <div key={item.industry} className={`rounded-3xl p-5 sm:p-8 text-center border shadow-sm ${item.color}`}>
                 <div className="text-4xl lg:text-5xl font-bold mb-2 font-heading">{item.count}</div>
                 <div className="text-base font-semibold">{item.industry} Clients</div>
               </div>

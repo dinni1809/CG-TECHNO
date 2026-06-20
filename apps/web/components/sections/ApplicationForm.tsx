@@ -189,7 +189,7 @@ export function ApplicationForm() {
   return (
     <div className="space-y-16">
       {/* SECTION 3 — INTRODUCTION BLOCK */}
-      <div className="bg-gradient-to-br from-primary-900 to-primary-950 text-white rounded-3xl p-8 sm:p-12 border border-primary-850 shadow-xl relative overflow-hidden">
+      <div className="bg-gradient-to-br from-primary-900 to-primary-950 text-white rounded-3xl p-5 sm:p-12 border border-primary-850 shadow-xl relative overflow-hidden">
         <div className="absolute right-0 top-0 w-64 h-64 bg-primary-800/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute left-1/3 bottom-0 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
         
@@ -208,7 +208,7 @@ export function ApplicationForm() {
       </div>
 
       {/* SECTION 4 — APPLICANT ADVANTAGE PANEL */}
-      <div className="bg-gradient-to-br from-blue-50 to-indigo-50/50 border border-blue-100 rounded-3xl p-8 sm:p-10 shadow-sm">
+      <div className="bg-gradient-to-br from-blue-50 to-indigo-50/50 border border-blue-100 rounded-3xl p-5 sm:p-10 shadow-sm">
         <div className="flex items-start gap-4">
           <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center shrink-0">
             <Sparkles className="text-blue-600" size={20} />
@@ -285,7 +285,7 @@ export function ApplicationForm() {
             <input type="text" name="website" tabIndex={-1} autoComplete="off" />
           </div>
           {/* Card 1: Personal Information */}
-          <div className="bg-white rounded-3xl p-8 sm:p-10 border border-gray-150 shadow-sm hover:shadow-md transition-shadow space-y-6">
+          <div className="bg-white rounded-3xl p-5 sm:p-10 border border-gray-150 shadow-sm hover:shadow-md transition-shadow space-y-6">
             <div className="flex items-start gap-4 pb-4 border-b border-gray-100">
               <div className="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center text-primary-800 shrink-0">
                 <User size={20} />
@@ -348,7 +348,7 @@ export function ApplicationForm() {
           </div>
 
           {/* Card 2: Education & Experience */}
-          <div className="bg-white rounded-3xl p-8 sm:p-10 border border-gray-150 shadow-sm hover:shadow-md transition-shadow space-y-8">
+          <div className="bg-white rounded-3xl p-5 sm:p-10 border border-gray-150 shadow-sm hover:shadow-md transition-shadow space-y-8">
             <div className="flex items-start gap-4 pb-4 border-b border-gray-100">
               <div className="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center text-primary-800 shrink-0">
                 <GraduationCap size={20} />
@@ -496,7 +496,7 @@ export function ApplicationForm() {
           </div>
 
           {/* Card 3: Areas of Interest */}
-          <div className="bg-white rounded-3xl p-8 sm:p-10 border border-gray-150 shadow-sm hover:shadow-md transition-shadow space-y-6">
+          <div className="bg-white rounded-3xl p-5 sm:p-10 border border-gray-150 shadow-sm hover:shadow-md transition-shadow space-y-6">
             <div className="flex items-start gap-4 pb-4 border-b border-gray-100">
               <div className="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center text-primary-800 shrink-0">
                 <Sparkles size={20} />
@@ -542,7 +542,7 @@ export function ApplicationForm() {
           </div>
 
           {/* Card 4: Additional Information */}
-          <div className="bg-white rounded-3xl p-8 sm:p-10 border border-gray-150 shadow-sm hover:shadow-md transition-shadow space-y-6">
+          <div className="bg-white rounded-3xl p-5 sm:p-10 border border-gray-150 shadow-sm hover:shadow-md transition-shadow space-y-6">
             <div className="flex items-start gap-4 pb-4 border-b border-gray-100">
               <div className="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center text-primary-800 shrink-0">
                 <PlusCircle size={20} />
@@ -602,7 +602,7 @@ export function ApplicationForm() {
           </div>
 
           {/* Card 5: Resume Upload */}
-          <div className="bg-white rounded-3xl p-8 sm:p-10 border border-gray-150 shadow-sm hover:shadow-md transition-shadow space-y-6">
+          <div className="bg-white rounded-3xl p-5 sm:p-10 border border-gray-150 shadow-sm hover:shadow-md transition-shadow space-y-6">
             <div className="flex items-start gap-4 pb-4 border-b border-gray-100">
               <div className="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center text-primary-800 shrink-0">
                 <Upload size={20} />
@@ -663,7 +663,7 @@ export function ApplicationForm() {
           </div>
 
           {/* SECTION 10 — APPLICATION TIPS PANEL */}
-          <div className="bg-amber-50/40 border border-amber-100 rounded-3xl p-8 space-y-4">
+          <div className="bg-amber-50/40 border border-amber-100 rounded-3xl p-5 sm:p-8 space-y-4">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
                 <Sparkles className="text-amber-800" size={16} />
@@ -688,7 +688,7 @@ export function ApplicationForm() {
           </div>
 
           {/* SECTION 11 — PREMIUM SUBMIT AREA */}
-          <div className="bg-white rounded-3xl p-8 sm:p-10 border border-gray-150 shadow-sm space-y-6 text-center">
+          <div className="bg-white rounded-3xl p-5 sm:p-10 border border-gray-150 shadow-sm space-y-6 text-center">
             <div className="max-w-2xl mx-auto space-y-2">
               <h3 className="text-2xl font-extrabold text-gray-900 font-heading">Ready to Join CG Techno?</h3>
               <p className="text-sm text-gray-550 leading-relaxed">
@@ -751,7 +751,7 @@ export function ApplicationForm() {
           </div>
 
           {/* SECTION 9 — HIRING PROCESS TIMELINE */}
-          <div className="bg-white rounded-3xl p-8 sm:p-10 border border-gray-150 shadow-sm space-y-8">
+          <div className="bg-white rounded-3xl p-5 sm:p-10 border border-gray-150 shadow-sm space-y-8">
             <div className="text-center md:text-left">
               <h3 className="text-xl font-bold text-gray-900 font-heading">What Happens Next?</h3>
               <p className="text-sm text-gray-550">Our streamlined recruitment process helps us find the best fit quickly.</p>
