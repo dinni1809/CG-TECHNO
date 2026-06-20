@@ -18,12 +18,12 @@ export function HeroSection() {
         <motion.div
           animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] }}
           transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-          className="absolute top-20 left-10 w-96 h-96 bg-primary-600/20 rounded-full blur-3xl"
+          className="absolute top-20 left-10 w-96 h-96 bg-primary-600/10 rounded-full blur-3xl"
         />
         <motion.div
           animate={{ scale: [1.1, 1, 1.1], opacity: [0.2, 0.4, 0.2] }}
           transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
-          className="absolute bottom-20 right-10 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl"
+          className="absolute bottom-20 right-10 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl"
         />
         <motion.div
           animate={{ scale: [1, 1.2, 1], opacity: [0.15, 0.3, 0.15] }}
@@ -47,10 +47,10 @@ export function HeroSection() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.2, ease: [0.21, 0.47, 0.32, 0.98] }}
-          className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white leading-tight tracking-tight mb-8"
+          className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight tracking-tight mb-8"
         >
           Enterprise{' '}
-          <span className="bg-gradient-to-r from-blue-300 via-cyan-300 to-emerald-300 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-blue-200 via-emerald-200 to-cyan-200 bg-clip-text text-transparent">
             IT Infrastructure
           </span>
           <br className="hidden sm:block" />
@@ -77,17 +77,17 @@ export function HeroSection() {
             <Link
               href="/contact"
               onClick={() => trackCTA('Get Free Consultation', 'Request Consultation Clicked')}
-              className="inline-flex items-center gap-2.5 px-10 py-5 bg-white text-primary-900 font-bold rounded-xl shadow-xl hover:shadow-2xl transition-all duration-200 text-lg"
+              className="inline-flex items-center gap-2 px-6 py-3 sm:px-7 sm:py-3.5 bg-white text-primary-900 font-bold rounded-xl shadow-xl hover:shadow-2xl transition-all duration-200 text-sm sm:text-base"
             >
               Get Free Consultation
-              <ArrowRight size={20} />
+              <ArrowRight size={18} />
             </Link>
           </motion.div>
           <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
             <Link
               href="/services"
               onClick={() => trackCTA('Explore Services', 'Explore Solutions Clicked')}
-              className="inline-flex items-center gap-2.5 px-10 py-5 border-2 border-white/30 text-white font-bold rounded-xl hover:bg-white/10 backdrop-blur-sm transition-all duration-200 text-lg"
+              className="inline-flex items-center gap-2 px-6 py-3 sm:px-7 sm:py-3.5 border-2 border-white/30 text-white font-bold rounded-xl hover:bg-white/10 backdrop-blur-sm transition-all duration-200 text-sm sm:text-base"
             >
               Explore Services
             </Link>
