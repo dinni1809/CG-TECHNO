@@ -8,9 +8,6 @@ module.exports = {
   darkMode: 'class',
   theme: {
     extend: {
-      maxWidth: {
-        '7xl': '100rem',
-      },
       fontSize: {
         'xs': ['var(--text-xs)', { lineHeight: 'var(--lh-xs, 1.5)' }],
         'sm': ['var(--text-sm)', { lineHeight: 'var(--lh-sm, 1.5)' }],
@@ -45,8 +42,8 @@ module.exports = {
         },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        heading: ['Space Grotesk', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
+        heading: ['var(--font-heading)', 'system-ui', 'sans-serif'],
       },
       animation: {
         marquee: 'marquee 30s linear infinite',
