@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700;800&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -11,50 +9,50 @@
     --color-brand-green: 21 90 44;
 
     /* Responsive Typography - Mobile Default (< 768px) */
-    --text-xs: 0.875rem; /* 14px */
-    --text-sm: 0.9375rem; /* 15px */
-    --text-base: 1rem; /* 16px */
-    --text-lg: 1.125rem; /* 18px */
-    --text-xl: 1.25rem; /* 20px */
-    --text-2xl: 1.375rem; /* 22px */
-    --text-3xl: 1.625rem; /* 26px */
-    --text-4xl: 2rem; /* 32px */
-    --text-5xl: 2.375rem; /* 38px */
-    --text-6xl: 2.75rem; /* 44px */
-    --text-7xl: 3.25rem; /* 52px */
+    --text-xs: 0.75rem;     /* 12px */
+    --text-sm: 0.875rem;    /* 14px */
+    --text-base: 1rem;      /* 16px */
+    --text-lg: 1.125rem;    /* 18px */
+    --text-xl: 1.25rem;     /* 20px */
+    --text-2xl: 1.5rem;     /* 24px */
+    --text-3xl: 1.875rem;   /* 30px */
+    --text-4xl: 2.25rem;    /* 36px */
+    --text-5xl: 3rem;       /* 48px */
+    --text-6xl: 3.75rem;    /* 60px */
+    --text-7xl: 4.5rem;     /* 72px */
   }
 
   @media (min-width: 768px) {
     :root {
       /* Responsive Typography - Tablet (768px - 1023px) */
-      --text-xs: 0.9375rem; /* 15px */
-      --text-sm: 1rem; /* 16px */
-      --text-base: 1.125rem; /* 18px */
-      --text-lg: 1.25rem; /* 20px */
-      --text-xl: 1.375rem; /* 22px */
-      --text-2xl: 1.625rem; /* 26px */
-      --text-3xl: 2rem; /* 32px */
-      --text-4xl: 2.5rem; /* 40px */
-      --text-5xl: 3rem; /* 48px */
-      --text-6xl: 3.375rem; /* 54px */
-      --text-7xl: 4rem; /* 64px */
+      --text-xs: 0.75rem;     /* 12px */
+      --text-sm: 0.875rem;    /* 14px */
+      --text-base: 1rem;      /* 16px */
+      --text-lg: 1.125rem;    /* 18px */
+      --text-xl: 1.25rem;     /* 20px */
+      --text-2xl: 1.5rem;     /* 24px */
+      --text-3xl: 2rem;       /* 32px */
+      --text-4xl: 2.5rem;     /* 40px */
+      --text-5xl: 3.25rem;    /* 52px */
+      --text-6xl: 4rem;       /* 64px */
+      --text-7xl: 5rem;       /* 80px */
     }
   }
 
   @media (min-width: 1024px) {
     :root {
       /* Responsive Typography - Desktop (1024px+) */
-      --text-xs: 1rem; /* 16px */
-      --text-sm: 1.125rem; /* 18px */
-      --text-base: 1.25rem; /* 20px */
-      --text-lg: 1.375rem; /* 22px */
-      --text-xl: 1.5rem; /* 24px */
-      --text-2xl: 1.875rem; /* 30px */
-      --text-3xl: 2.25rem; /* 36px */
-      --text-4xl: 3rem; /* 48px */
-      --text-5xl: 3.75rem; /* 60px */
-      --text-6xl: 4rem; /* 64px */
-      --text-7xl: 5rem; /* 80px */
+      --text-xs: 0.8125rem;   /* 13px */
+      --text-sm: 0.9375rem;   /* 15px */
+      --text-base: 1.0625rem; /* 17px */
+      --text-lg: 1.1875rem;   /* 19px */
+      --text-xl: 1.3125rem;   /* 21px */
+      --text-2xl: 1.625rem;   /* 26px */
+      --text-3xl: 2.25rem;    /* 36px */
+      --text-4xl: 2.75rem;    /* 44px */
+      --text-5xl: 3.5rem;     /* 56px */
+      --text-6xl: 4.25rem;    /* 68px */
+      --text-7xl: 5.25rem;    /* 84px */
     }
   }
 
