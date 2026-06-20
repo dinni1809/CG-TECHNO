@@ -45,14 +45,14 @@
       --text-xs: 0.8125rem;   /* 13px */
       --text-sm: 0.9375rem;   /* 15px */
       --text-base: 1.0625rem; /* 17px */
-      --text-lg: 1.1875rem;   /* 19px */
-      --text-xl: 1.3125rem;   /* 21px */
-      --text-2xl: 1.625rem;   /* 26px */
-      --text-3xl: 2.25rem;    /* 36px */
-      --text-4xl: 2.75rem;    /* 44px */
-      --text-5xl: 3.5rem;     /* 56px */
-      --text-6xl: 4.25rem;    /* 68px */
-      --text-7xl: 5.25rem;    /* 84px */
+      --text-lg: 1.125rem;    /* 18px */
+      --text-xl: 1.25rem;     /* 20px */
+      --text-2xl: 1.5rem;     /* 24px */
+      --text-3xl: 2.0rem;     /* 32px */
+      --text-4xl: 2.5rem;     /* 40px */
+      --text-5xl: 3.0rem;     /* 48px */
+      --text-6xl: 3.75rem;    /* 60px */
+      --text-7xl: 4.5rem;     /* 72px */
     }
   }
 
@@ -100,19 +100,19 @@
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-3 px-8 py-4 bg-primary-800 text-white font-semibold rounded-xl
+    @apply inline-flex items-center justify-center gap-3 px-6 py-3 sm:px-7 sm:py-3.5 text-sm sm:text-base bg-primary-800 text-white font-semibold rounded-xl
            hover:bg-primary-700 active:bg-primary-900 transition-all duration-200 shadow-md hover:shadow-lg
            focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-3 px-8 py-4 border-2 border-primary-800 text-primary-800 font-semibold rounded-xl
+    @apply inline-flex items-center justify-center gap-3 px-6 py-3 sm:px-7 sm:py-3.5 text-sm sm:text-base border-2 border-primary-800 text-primary-800 font-semibold rounded-xl
            hover:bg-primary-800 hover:text-white transition-all duration-200
            focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
   }
 
   .btn-accent {
-    @apply inline-flex items-center justify-center gap-3 px-8 py-4 bg-primary-500 text-white font-semibold rounded-xl
+    @apply inline-flex items-center justify-center gap-3 px-6 py-3 sm:px-7 sm:py-3.5 text-sm sm:text-base bg-primary-500 text-white font-semibold rounded-xl
            hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 shadow-md hover:shadow-lg
            focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2;
   }
