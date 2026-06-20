@@ -47,7 +47,7 @@ export function Navbar() {
         )}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20 lg:h-24">
+          <div className="flex items-center justify-between h-16 lg:h-20">
             <Link href="/" prefetch={true} className="flex items-center gap-3 group">
               <motion.div
                 whileHover={{ scale: 1.03 }}
@@ -67,8 +67,8 @@ export function Navbar() {
                   className={cn(
                     'object-contain transition-all duration-300',
                     isScrolled 
-                      ? 'h-9 md:h-[44px] lg:h-[52px]' 
-                      : 'h-[44px] md:h-[52px] lg:h-[64px]'
+                      ? 'h-8 md:h-[38px] lg:h-[42px]' 
+                      : 'h-[38px] md:h-[44px] lg:h-[50px]'
                   )}
                   style={{
                     width: 'auto',
@@ -90,7 +90,7 @@ export function Navbar() {
                     href={link.href}
                     prefetch={true}
                     className={cn(
-                      'relative px-4 py-2.5 text-base font-medium rounded-xl transition-all duration-200 group',
+                      'relative px-3.5 py-2 text-sm font-medium rounded-xl transition-all duration-200 group',
                       isActive
                         ? isLightNavbar
                           ? 'text-primary-800 font-semibold'
@@ -130,7 +130,7 @@ export function Navbar() {
                   href={navCTA.href}
                   prefetch={true}
                   onClick={() => trackCTA(navCTA.label, 'Request Consultation Clicked')}
-                  className="px-6 py-3 bg-primary-800 text-white text-base font-semibold rounded-xl hover:bg-primary-700 transition-colors shadow-md hover:shadow-lg"
+                  className="px-5 py-2.5 bg-primary-800 text-white text-sm font-semibold rounded-xl hover:bg-primary-700 transition-colors shadow-md hover:shadow-lg"
                 >
                   {navCTA.label}
                 </Link>
@@ -162,7 +162,7 @@ export function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-x-0 top-20 z-40 bg-[#06142D]/95 backdrop-blur-xl border-b border-white/10 shadow-2xl lg:hidden"
+            className="fixed inset-x-0 top-16 z-40 bg-[#06142D]/95 backdrop-blur-xl border-b border-white/10 shadow-2xl lg:hidden"
           >
             <div className="px-4 py-6 space-y-1">
               {navLinks.map((link) => {
