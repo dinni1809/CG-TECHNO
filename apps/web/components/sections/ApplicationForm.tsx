@@ -65,7 +65,7 @@ export function ApplicationForm() {
     form.register('resume', {
       required: 'Resume is required',
       validate: {
-        lessThan10MB: (file) => !file || file.size <= 10 * 1024 * 1024 || 'Max file size is 10MB',
+        lessThan4MB: (file) => !file || file.size <= 4 * 1024 * 1024 || 'Max file size is 4MB',
         acceptedFormats: (file) =>
           !file ||
           ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'].includes(file.type) ||
@@ -645,7 +645,7 @@ export function ApplicationForm() {
                     </div>
                     <div className="space-y-1">
                       <p className="text-sm font-bold text-gray-900">Click to upload or drag & drop</p>
-                      <p className="text-xs text-gray-400">PDF, DOC, or DOCX formats only (Max 10MB)</p>
+                      <p className="text-xs text-gray-400">PDF, DOC, or DOCX formats only (Max 4MB)</p>
                     </div>
                   </>
                 )}
