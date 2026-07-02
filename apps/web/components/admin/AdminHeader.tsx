@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { signOut } from 'next-auth/react';
 import Image from 'next/image';
-import { BarChart3, ListFilter, LogOut, Briefcase } from 'lucide-react';
+import { BarChart3, ListFilter, LogOut, Briefcase, Mail } from 'lucide-react';
 
 export function AdminHeader() {
   const pathname = usePathname();
@@ -13,6 +13,7 @@ export function AdminHeader() {
     { href: '/admin/dashboard', label: 'Dashboard', icon: BarChart3 },
     { href: '/admin/enquiries', label: 'Enquiries', icon: ListFilter },
     { href: '/admin/applications', label: 'Careers', icon: Briefcase },
+    { href: '/admin/emails', label: 'Emails', icon: Mail },
   ];
 
   return (

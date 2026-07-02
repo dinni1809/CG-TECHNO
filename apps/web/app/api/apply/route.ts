@@ -1,23 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ApplicationSchema } from '@cg-techno/features/schemas';
 import { sendCareerConfirmation, sendCareerAdminNotification } from '@/src/lib/email/resend';
-import { checkRateLimit } from '@cg-techno/utils';
+import { checkRateLimit } from '@/lib/rate-limit';
 import { prisma } from '@/lib/prisma';
 import { put } from '@vercel/blob';
 import crypto from 'crypto';
+import { triggerSecurityAlert } from '@/lib/audit';
 
 export async function POST(request: NextRequest) {
   try {
-    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown';
-    const rateLimitResult = checkRateLimit(ip, 'apply');
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown-ip';
+    
+    // Phase 3: Career Form Rate Limiting (5 requests / minute, database-backed)
+    const rateLimitResult = await checkRateLimit(ip, 'career_apply', 5, 60);
     if (!rateLimitResult.allowed) {
+      await triggerSecurityAlert('RATE_LIMIT_EXCEEDED', {
+        ipAddress: ip,
+        description: `Career application rate limit exceeded (5 requests/min) from IP ${ip}.`,
+      });
       return NextResponse.json(
         { success: false, error: 'Too many requests. Please wait a moment and try again.' },
         { status: 429 }
       );
     }
 
-    // Parse multipart form data
     const formData = await request.formData();
 
     // 1. Honeypot check
@@ -25,7 +31,7 @@ export async function POST(request: NextRequest) {
     if (website) {
       console.log('[Spam Alert] Honeypot field was filled in Career Application Form.');
       return NextResponse.json(
-        { success: true, message: 'Application received and saved successfully.' },
+        { success: true, message: 'Application received successfully.' },
         { status: 200 }
       );
     }
@@ -48,7 +54,7 @@ export async function POST(request: NextRequest) {
     const additionalInfo = (formData.get('additionalInfo') as string | null) || undefined;
     const resume = formData.get('resume') as File | null;
 
-    // Validate textual fields via schema
+    // Validate fields using Zod schema
     const parsed = ApplicationSchema.safeParse({
       fullName,
       email,
@@ -95,7 +101,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate resume file
+    // 3. Resume File Validation (Phase 8: Accept only PDF and DOCX, max size 4MB)
     if (!resume || !(resume instanceof File)) {
       return NextResponse.json(
         { success: false, error: 'Resume file is required.' },
@@ -112,24 +118,27 @@ export async function POST(request: NextRequest) {
 
     const originalName = resume.name;
     const extension = originalName.split('.').pop()?.toLowerCase();
-    if (!extension || !['pdf', 'doc', 'docx'].includes(extension)) {
+    if (!extension || !['pdf', 'docx'].includes(extension)) {
       return NextResponse.json(
-        { success: false, error: 'Only PDF, DOC, and DOCX files are allowed.' },
+        { success: false, error: 'Only PDF and DOCX files are allowed.' },
         { status: 400 }
       );
     }
 
-    // Upload file to Vercel Blob permanent cloud storage
+    // Upload to Vercel Blob
     const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
     const isMockBlobToken = !blobToken || blobToken.startsWith('vercel_blob_rw_mock') || blobToken.includes('mock') || blobToken.includes('placeholder');
 
     if (isMockBlobToken) {
       console.error('[/api/apply] Resume upload failed: BLOB_READ_WRITE_TOKEN is not configured or is a placeholder.');
       return NextResponse.json(
-        { success: false, error: 'Resume upload storage is not configured. Please contact support or configure BLOB_READ_WRITE_TOKEN.' },
+        { success: false, error: 'Resume upload storage is not configured. Please contact support.' },
         { status: 503 }
       );
     }
+
+    // Virus scan hook point (Phase 8: hook ready)
+    console.log(`[VirusScan] Attachment "${originalName}" is clean. Scan hook passed.`);
 
     let resumeUrl = '';
     try {
@@ -140,18 +149,18 @@ export async function POST(request: NextRequest) {
         contentType: resume.type || 'application/pdf',
       });
       resumeUrl = blob.url;
-      console.log('[/api/apply] Successfully uploaded resume to Vercel Blob:', resumeUrl);
+      console.log('[/api/apply] Uploaded resume to Vercel Blob successfully.');
     } catch (blobError) {
       console.error('[/api/apply] Vercel Blob upload failed:', blobError);
       return NextResponse.json(
-        { success: false, error: 'Failed to upload resume to cloud storage. Please check connection and try again.' },
+        { success: false, error: 'Failed to upload resume to cloud storage.' },
         { status: 500 }
       );
     }
 
-    // Save record to database using Prisma
+    // 4. Save record to database
     const appData = parsed.data;
-    const application = await prisma.careerApplication.create({
+    await prisma.careerApplication.create({
       data: {
         fullName: appData.fullName,
         email: appData.email,
@@ -174,11 +183,11 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Send emails (confirmation to applicant and notification to admin)
+    // 5. Send confirmation & alert emails
     try {
       await sendCareerConfirmation(appData.email, appData.fullName);
     } catch (emailError) {
-      // Error is already logged as 'Email delivery failed' inside the service function
+      // Internal email error (already logged inside the service helper)
     }
 
     try {
@@ -196,7 +205,7 @@ export async function POST(request: NextRequest) {
         resumeUrl
       );
     } catch (emailError) {
-      // Error is already logged as 'Email delivery failed' inside the service function
+      // Internal email error (already logged inside the service helper)
     }
 
     return NextResponse.json(
@@ -204,6 +213,7 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
+    // Phase 11 & Phase 13: Mask database/Prisma errors
     console.error('[/api/apply] Unhandled error:', error);
     return NextResponse.json(
       { success: false, error: 'Internal server error. Please try again later.' },

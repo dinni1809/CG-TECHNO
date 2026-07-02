@@ -1,18 +1,5 @@
-import { Resend } from 'resend';
-import React from 'react';
+import { CommunicationEngine } from '@/lib/email';
 import fs from 'fs';
-import { ContactConfirmation } from './templates/contact-confirmation';
-import { ContactAdmin } from './templates/contact-admin';
-import { CareerConfirmation } from './templates/career-confirmation';
-import { CareerAdmin } from './templates/career-admin';
-
-// Initialize the Resend client with API Key
-const resend = new Resend(process.env.RESEND_API_KEY || 're_placeholder_api_key');
-
-// Get sender email from environment (fallback to Resend onboarding address)
-const getEmailFrom = (): string => {
-  return process.env.EMAIL_FROM || 'onboarding@resend.dev';
-};
 
 // Parse admin emails (comma-separated list support, fallback to ADMIN_EMAIL or default)
 const getAdminEmails = (): string[] => {
@@ -27,6 +14,35 @@ const getAdminEmails = (): string[] => {
   return ['cgtechnoelectronics@gmail.com'];
 };
 
+// Helper to build secure attachment structures
+function resolveAttachmentDetails(path?: string, filename?: string) {
+  if (!path) return undefined;
+  const resolvedName = filename || path.split('/').pop() || 'resume.pdf';
+  let size = 180000; // Safe 180KB fallback size
+  let mime = 'application/pdf';
+
+  if (resolvedName.endsWith('.doc')) mime = 'application/msword';
+  if (resolvedName.endsWith('.docx')) mime = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+
+  if (!path.startsWith('http')) {
+    try {
+      if (fs.existsSync(path)) {
+        size = fs.statSync(path).size;
+      }
+    } catch {}
+  }
+
+  return [
+    {
+      filename: resolvedName,
+      size,
+      mime,
+      blobUrl: path,
+      provider: path.startsWith('http') ? 'vercel-blob' : 'local',
+    },
+  ];
+}
+
 /**
  * 1. Contact Form - Customer Confirmation Email
  */
@@ -35,30 +51,22 @@ export async function sendContactConfirmation(
   customerName: string,
   serviceSelected: string
 ): Promise<void> {
-  try {
-    const emailFrom = getEmailFrom();
-    const result = await resend.emails.send({
-      from: `CG Techno Electronics <${emailFrom}>`,
-      to,
-      subject: 'Thank You for Contacting CG Techno Electronics',
-      react: React.createElement(ContactConfirmation, {
-        customerName,
-        serviceSelected,
-      }),
-    });
-
-    if (result.error) {
-      throw new Error(result.error.message);
-    }
-    console.log('Contact confirmation sent');
-  } catch (error) {
-    console.error('Email delivery failed', error);
-    throw error; // Propagate error for the API route logger to capture details
-  }
+  const correlationId = `contact-confirm-${Date.now()}`;
+  await CommunicationEngine.dispatch('EMAIL', {
+    correlationId,
+    to,
+    subject: 'Thank You for Contacting CG Techno Electronics',
+    template: 'CONTACT_CONFIRMATION',
+    metadata: {
+      customerName,
+      serviceSelected,
+    },
+    source: 'contact_form_customer',
+  });
 }
 
 /**
- * 2. Contact Form - Admin Notification Email (Multiple Admins Supported)
+ * 2. Contact Form - Admin Notification Email
  */
 export async function sendContactAdminNotification(data: {
   name: string;
@@ -70,35 +78,27 @@ export async function sendContactAdminNotification(data: {
   message: string;
   timestamp: Date;
 }): Promise<void> {
-  try {
-    const emailFrom = getEmailFrom();
-    const adminRecipients = getAdminEmails();
-
-    const result = await resend.emails.send({
-      from: `CG Techno Website Lead <${emailFrom}>`,
-      to: adminRecipients,
-      replyTo: data.email,
-      subject: 'New Website Enquiry Received',
-      react: React.createElement(ContactAdmin, {
-        name: data.name,
-        email: data.email,
-        phone: data.phone,
-        company: data.company,
-        service: data.service,
-        subject: data.subject,
-        message: data.message,
-        timestamp: data.timestamp.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }) + ' IST',
-      }),
-    });
-
-    if (result.error) {
-      throw new Error(result.error.message);
-    }
-    console.log('Contact admin notification sent');
-  } catch (error) {
-    console.error('Email delivery failed', error);
-    throw error;
-  }
+  const adminRecipients = getAdminEmails();
+  const correlationId = `contact-admin-${Date.now()}`;
+  
+  await CommunicationEngine.dispatch('EMAIL', {
+    correlationId,
+    to: adminRecipients,
+    replyTo: data.email,
+    subject: 'New Website Enquiry Received',
+    template: 'CONTACT_ADMIN',
+    metadata: {
+      name: data.name,
+      email: data.email,
+      phone: data.phone,
+      company: data.company,
+      service: data.service,
+      subject: data.subject,
+      message: data.message,
+      timestamp: data.timestamp.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }) + ' IST',
+    },
+    source: 'contact_form_admin',
+  });
 }
 
 /**
@@ -108,25 +108,17 @@ export async function sendCareerConfirmation(
   to: string,
   applicantName: string
 ): Promise<void> {
-  try {
-    const emailFrom = getEmailFrom();
-    const result = await resend.emails.send({
-      from: `CG Techno Careers <${emailFrom}>`,
-      to,
-      subject: 'Application Received – CG Techno Electronics',
-      react: React.createElement(CareerConfirmation, {
-        applicantName,
-      }),
-    });
-
-    if (result.error) {
-      throw new Error(result.error.message);
-    }
-    console.log('Career confirmation sent');
-  } catch (error) {
-    console.error('Email delivery failed', error);
-    throw error;
-  }
+  const correlationId = `career-confirm-${Date.now()}`;
+  await CommunicationEngine.dispatch('EMAIL', {
+    correlationId,
+    to,
+    subject: 'Application Received – CG Techno Electronics',
+    template: 'CAREER_CONFIRMATION',
+    metadata: {
+      applicantName,
+    },
+    source: 'career_form_customer',
+  });
 }
 
 /**
@@ -145,86 +137,28 @@ export async function sendCareerAdminNotification(
   },
   resumeLocalPath?: string
 ): Promise<void> {
-  try {
-    const emailFrom = getEmailFrom();
-    const adminRecipients = getAdminEmails();
+  const adminRecipients = getAdminEmails();
+  const correlationId = `career-admin-${Date.now()}`;
+  const attachments = resolveAttachmentDetails(resumeLocalPath, data.resumeOriginalName);
 
-    const attachments: Array<{ filename: string; content: Buffer }> = [];
-    if (resumeLocalPath) {
-      try {
-        let fileContent: Buffer;
-        if (resumeLocalPath.startsWith('http://') || resumeLocalPath.startsWith('https://')) {
-          const res = await fetch(resumeLocalPath);
-          if (!res.ok) {
-            throw new Error(`Failed to fetch file from Blob storage: ${res.statusText}`);
-          }
-          fileContent = Buffer.from(await res.arrayBuffer());
-        } else if (fs.existsSync(resumeLocalPath)) {
-          fileContent = fs.readFileSync(resumeLocalPath);
-        } else {
-          throw new Error('File path does not exist');
-        }
-        attachments.push({
-          filename: data.resumeOriginalName || 'resume.pdf',
-          content: fileContent,
-        });
-      } catch (fileError) {
-        console.warn(`[Warning] Could not attach resume file: ${fileError instanceof Error ? fileError.message : 'Unknown error'}`);
-      }
-    }
-
-    const result = await resend.emails.send({
-      from: `CG Techno Recruitment <${emailFrom}>`,
-      to: adminRecipients,
-      replyTo: data.email,
-      subject: 'New Career Application Received',
-      react: React.createElement(CareerAdmin, {
-        name: data.name,
-        email: data.email,
-        phone: data.phone,
-        qualification: data.qualification,
-        experience: data.experience,
-        interests: data.interests,
-        resumeOriginalName: data.resumeOriginalName,
-        timestamp: data.timestamp.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }) + ' IST',
-      }),
-      attachments,
-    });
-
-    if (result.error) {
-      throw new Error(result.error.message);
-    }
-    console.log('Career admin notification sent');
-  } catch (error) {
-    console.error('Email delivery failed', error);
-    throw error;
-  }
+  await CommunicationEngine.dispatch('EMAIL', {
+    correlationId,
+    to: adminRecipients,
+    replyTo: data.email,
+    subject: 'New Career Application Received',
+    template: 'CAREER_ADMIN',
+    metadata: {
+      name: data.name,
+      email: data.email,
+      phone: data.phone,
+      qualification: data.qualification,
+      experience: data.experience,
+      interests: data.interests,
+      resumeOriginalName: data.resumeOriginalName,
+      resumeUrl: resumeLocalPath, // display button link fallback inside templates
+      timestamp: data.timestamp.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }) + ' IST',
+    },
+    attachments,
+    source: 'career_form_admin',
+  });
 }
-
-/**
- * FUTURE-PROOF STATUS UPDATE EMAIL WORKFLOWS
- * When HR changes an application's status in the dashboard, you can trigger email updates easily.
- * To integrate it later:
- * 1. Create a status update template (e.g. `src/lib/email/templates/status-update.tsx`).
- * 2. Import the template and export a function similar to the following:
- *
- * export async function sendStatusUpdateEmail(
- *   to: string,
- *   applicantName: string,
- *   newStatus: 'Applied' | 'Shortlisted' | 'Interview Scheduled' | 'Rejected' | 'Selected'
- * ): Promise<void> {
- *   try {
- *     const emailFrom = getEmailFrom();
- *     const result = await resend.emails.send({
- *       from: `CG Techno HR <${emailFrom}>`,
- *       to,
- *       subject: `Application Update: ${newStatus} – CG Techno Electronics`,
- *       react: React.createElement(StatusUpdateTemplate, { applicantName, newStatus }),
- *     });
- *     if (result.error) throw new Error(result.error.message);
- *     console.log(`Status update email (${newStatus}) sent to ${to}`);
- *   } catch (error) {
- *     console.error('Email delivery failed', error);
- *   }
- * }
- */

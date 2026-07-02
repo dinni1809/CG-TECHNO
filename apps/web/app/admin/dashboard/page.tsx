@@ -18,8 +18,12 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
-// Caching: Revalidate the dashboard metrics page every 30 seconds to reduce DB load
-export const revalidate = 30;
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { redirect } from 'next/navigation';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 interface ActivityEvent {
   id: string;
@@ -30,7 +34,18 @@ interface ActivityEvent {
   timestamp: Date;
 }
 
-export default async function AdminDashboard() {
+interface DashboardPageProps {
+  searchParams?: Promise<{ error?: string }>;
+}
+
+export default async function AdminDashboard({ searchParams }: DashboardPageProps) {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    redirect('/admin/login');
+  }
+
+  const params = await searchParams;
+  const error = params?.error;
   // Query 30 days window for trend metrics
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -241,6 +256,12 @@ export default async function AdminDashboard() {
       <AdminHeader />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
+        {error === 'unauthorized' && (
+          <div className="p-4 bg-red-50 border border-red-200 rounded-2xl text-sm text-red-800 font-semibold flex items-center gap-2">
+            <span>⚠️ Access Denied: You do not have permissions to access the requested admin section.</span>
+          </div>
+        )}
+
         {/* Welcome Section */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>

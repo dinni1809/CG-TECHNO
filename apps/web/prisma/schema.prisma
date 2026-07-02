@@ -22,11 +22,15 @@ model Enquiry {
 }
 
 model AdminUser {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  role      String   @default("SUPER_ADMIN")
-  createdAt DateTime @default(now())
+  id                  String    @id @default(uuid())
+  email               String    @unique
+  password            String
+  role                String    @default("SUPER_ADMIN") // SUPER_ADMIN, ADMIN, HR, SALES
+  failedLoginAttempts Int       @default(0)
+  lockoutUntil        DateTime?
+  lastFailedLogin     DateTime?
+  lastSuccessfulLogin DateTime?
+  createdAt           DateTime  @default(now())
 }
 
 model CareerApplication {
@@ -52,4 +56,212 @@ model CareerApplication {
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 }
+
+enum EmailStatus {
+  PENDING
+  PROCESSING
+  RETRYING
+  SENT
+  FAILED
+  BOUNCED
+  CANCELLED
+}
+
+enum EmailTemplate {
+  CONTACT_CONFIRMATION
+  CONTACT_ADMIN
+  CAREER_CONFIRMATION
+  CAREER_ADMIN
+  NEWSLETTER
+  OTP
+  SUPERVISOR_ALERT
+  SALES
+  SUPPORT
+  QUOTATION
+  SYSTEM
+}
+
+enum EmailCategory {
+  TRANSACTIONAL
+  MARKETING
+  SECURITY
+  SYSTEM
+}
+
+enum EmailPriority {
+  LOW
+  NORMAL
+  HIGH
+  CRITICAL
+}
+
+enum EmailProvider {
+  RESEND
+  SENDGRID
+  SMTP
+  AWS_SES
+  POSTMARK
+  MOCK
+}
+
+enum CommChannel {
+  EMAIL
+  SMS
+  WHATSAPP
+  PUSH
+  SLACK
+  TEAMS
+}
+
+model EmailConfiguration {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  value       String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model EmailLog {
+  id                String            @id @default(uuid())
+  correlationId     String            @default(uuid())
+  tenantId          String            @default("default-tenant")
+  providerMessageId String?
+  provider          EmailProvider     @default(RESEND)
+  channel           CommChannel       @default(EMAIL)
+  from              String
+  to                String            // Primary recipient email
+  cc                String[]          // CC recipient emails
+  bcc               String[]          // BCC recipient emails
+  replyTo           String?
+  subject           String
+  template          EmailTemplate
+  templateVersion   String            @default("1.0")
+  locale            String            @default("en")
+  category          EmailCategory     @default(TRANSACTIONAL)
+  priority          EmailPriority     @default(NORMAL)
+  status            EmailStatus       @default(PENDING)
+  payload           Json              // Complete request parameters JSON
+  metadata          Json?             // Custom template variables/context
+  attempts          Int               @default(0)
+  maxAttempts       Int               @default(3)
+  errorMessage      String?
+  failureReason     String?
+  providerResponse  Json?
+  httpStatus        Int?
+  responseTime      Int?              // Latency in milliseconds
+  source            String?           // E.g., 'contact_form', 'career_form'
+  leadId            String?           // References enquiryId or careerId
+  sessionId         String?
+  ipAddress         String?
+  userAgent         String?
+  country           String?
+  city              String?
+  
+  scheduledAt       DateTime?         // Future delivery queue support
+  expiresAt         DateTime?         // Retention policy support
+  sentAt            DateTime?
+  failedAt          DateTime?
+  lastRetryAt       DateTime?
+  deletedAt         DateTime?         // Soft delete support
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  attachments       EmailAttachment[]
+  events            EmailEvent[]
+
+  @@index([status])
+  @@index([template])
+  @@index([category])
+  @@index([providerMessageId])
+  @@index([correlationId])
+  @@index([tenantId])
+  @@index([createdAt])
+  @@index([source])
+}
+
+model EmailAttachment {
+  id           String   @id @default(uuid())
+  emailLogId   String
+  filename     String
+  size         Int
+  mime         String
+  blobUrl      String
+  provider     String   // E.g., 'vercel-blob', 'local', 's3'
+  createdAt    DateTime @default(now())
+  
+  emailLog     EmailLog @relation(fields: [emailLogId], references: [id], onDelete: Cascade)
+
+  @@index([emailLogId])
+}
+
+enum EmailEventType {
+  CREATED
+  VALIDATED
+  QUEUED
+  SENDING
+  SENT
+  FAILED
+  RETRYING
+  BOUNCED
+  DELIVERED
+  OPENED
+  CLICKED
+}
+
+model EmailEvent {
+  id               String         @id @default(uuid())
+  emailLogId       String
+  eventType        EmailEventType
+  message          String?
+  providerResponse Json?
+  metadata         Json?
+  error            String?
+  createdAt        DateTime       @default(now())
+
+  emailLog         EmailLog       @relation(fields: [emailLogId], references: [id], onDelete: Cascade)
+
+  @@index([emailLogId])
+  @@index([eventType])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  userEmail String?
+  action    String
+  entity    String
+  entityId  String?
+  result    String   // SUCCESS, FAILURE
+  ipAddress String?
+  userAgent String?
+  details   String?
+  timestamp DateTime @default(now())
+}
+
+model LoginAttempt {
+  id          String    @id @default(uuid())
+  ipAddress   String
+  email       String
+  attempts    Int       @default(1)
+  lastAttempt DateTime  @default(now())
+  lockedUntil DateTime?
+
+  @@unique([ipAddress, email])
+}
+
+model RateLimit {
+  id        String   @id @default(uuid())
+  ip        String
+  endpoint  String
+  count     Int      @default(1)
+  resetAt   DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([ip, endpoint])
+}
+
+
+
 

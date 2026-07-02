@@ -9,6 +9,7 @@ interface CareerAdminProps {
   interests: string[];
   resumeOriginalName: string;
   timestamp: string;
+  resumeUrl?: string;
 }
 
 export const CareerAdmin: React.FC<CareerAdminProps> = ({
@@ -20,6 +21,7 @@ export const CareerAdmin: React.FC<CareerAdminProps> = ({
   interests,
   resumeOriginalName,
   timestamp,
+  resumeUrl,
 }) => {
   return (
     <div style={{
@@ -88,7 +90,7 @@ export const CareerAdmin: React.FC<CareerAdminProps> = ({
             { label: 'Mobile Number', value: phone, href: `tel:${phone}` },
             { label: 'Highest Qualification', value: qualification },
             { label: 'Years of Experience', value: experience },
-            { label: 'Resume File', value: resumeOriginalName, isHighlight: true },
+            { label: 'Resume File', value: resumeOriginalName, href: resumeUrl, isHighlight: true },
             { label: 'Submission Timestamp', value: timestamp },
           ].map((field, idx) => {
             if (!field.value) return null;

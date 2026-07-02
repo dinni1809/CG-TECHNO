@@ -2,6 +2,11 @@ import { prisma } from '@/lib/prisma';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { EnquiryManager } from '@/components/admin/EnquiryManager';
 
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { redirect } from 'next/navigation';
+
+export const dynamic = 'force-dynamic';
 export const revalidate = 0; // Disable server component cache to load fresh lead data
 
 interface EnquiriesPageProps {
@@ -9,6 +14,15 @@ interface EnquiriesPageProps {
 }
 
 export default async function AdminEnquiries({ searchParams }: EnquiriesPageProps) {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    redirect('/admin/login');
+  }
+
+  // Role verification: Enquiries are accessible by SUPER_ADMIN, ADMIN, and SALES
+  if (!['SUPER_ADMIN', 'ADMIN', 'SALES'].includes((session?.user as any)?.role || '')) {
+    redirect('/admin/dashboard?error=unauthorized');
+  }
   const params = await searchParams;
   const page = parseInt(params?.page || '1', 10);
   const status = params?.status || 'ALL';

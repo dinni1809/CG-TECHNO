@@ -67,3 +67,4 @@ dummy_resume.docx
 # Prisma Generated Client
 apps/web/prisma/client/
 *.dll.node
+.vercel

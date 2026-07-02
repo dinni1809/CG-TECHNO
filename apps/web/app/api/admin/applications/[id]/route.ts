@@ -1,31 +1,41 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { withHardenedAPI } from '@/lib/api-middleware';
+import { createAuditLog } from '@/lib/audit';
+import { z } from 'zod';
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
-    }
+const UpdateApplicationSchema = z.object({
+  status: z.enum(['NEW', 'SHORTLISTED', 'INTERVIEW_SCHEDULED', 'SELECTED', 'REJECTED']),
+});
 
-    const { id } = params;
-    const { status } = await request.json();
+// PUT handler - update application status
+export const PUT = withHardenedAPI(
+  ['SUPER_ADMIN', 'ADMIN', 'HR'],
+  UpdateApplicationSchema
+)(async (request: NextRequest, { params, session, body }) => {
+  const { id } = params;
+  const { status } = body;
 
-    const allowedStatuses = ['NEW', 'SHORTLISTED', 'INTERVIEW_SCHEDULED', 'SELECTED', 'REJECTED'];
-    if (!allowedStatuses.includes(status)) {
-      return NextResponse.json({ success: false, error: 'Invalid status' }, { status: 400 });
-    }
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown-ip';
+  const userAgent = request.headers.get('user-agent') || 'unknown-ua';
 
-    const updatedApplication = await prisma.careerApplication.update({
-      where: { id },
-      data: { status },
-    });
+  const updatedApplication = await prisma.careerApplication.update({
+    where: { id },
+    data: { status },
+  });
 
-    return NextResponse.json({ success: true, application: updatedApplication }, { status: 200 });
-  } catch (error) {
-    console.error('[/api/admin/applications/[id]] PUT Error:', error);
-    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
-  }
-}
+  // Create status change Audit Log (Phase 7)
+  await createAuditLog({
+    userId: (session.user as any).id,
+    userEmail: session.user.email || undefined,
+    action: 'STATUS_CHANGE',
+    entity: 'CareerApplication',
+    entityId: id,
+    result: 'SUCCESS',
+    ipAddress: ip,
+    userAgent,
+    details: `Updated career application status to ${status}`,
+  });
+
+  return NextResponse.json({ success: true, application: updatedApplication }, { status: 200 });
+});

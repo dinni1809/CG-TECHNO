@@ -1,14 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ContactSchema } from '@cg-techno/features/schemas';
 import { sendContactConfirmation, sendContactAdminNotification } from '@/src/lib/email/resend';
-import { checkRateLimit } from '@cg-techno/utils';
+import { checkRateLimit } from '@/lib/rate-limit';
 import { prisma } from '@/lib/prisma';
+import { triggerSecurityAlert } from '@/lib/audit';
 
 export async function POST(request: NextRequest) {
   try {
-    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown';
-    const rateLimitResult = checkRateLimit(ip, 'contact');
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown-ip';
+    
+    // Phase 3: Contact Form Rate Limiting (10 requests / minute, database-backed)
+    const rateLimitResult = await checkRateLimit(ip, 'contact_form', 10, 60);
     if (!rateLimitResult.allowed) {
+      await triggerSecurityAlert('RATE_LIMIT_EXCEEDED', {
+        ipAddress: ip,
+        description: `Contact form rate limit exceeded (10 requests/min) from IP ${ip}.`,
+      });
       return NextResponse.json(
         { success: false, error: 'Too many requests. Please wait a moment and try again.' },
         { status: 429 }
@@ -38,7 +45,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { name, email, phone, message, service, product, company, subject } = parsed.data;
+    const { name, email, phone, message, service, company, subject } = parsed.data;
 
     // 2. Duplicate submission detection (5-minute window)
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
@@ -57,7 +64,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 1. Save Enquiry Lead to PostgreSQL database using Prisma
+    // 3. Save Enquiry Lead to database
     await prisma.enquiry.create({
       data: {
         fullName: name,
@@ -71,11 +78,11 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // 2. Trigger Email Workflows (Admin Alert + Customer Auto Reply)
+    // 4. Trigger Email Workflows
     try {
       await sendContactConfirmation(email, name, service || 'General Enquiry');
     } catch (emailError) {
-      // Error is already logged as 'Email delivery failed' inside the service function
+      // Internal email error (already logged inside the service helper)
     }
 
     try {
@@ -90,7 +97,7 @@ export async function POST(request: NextRequest) {
         timestamp: new Date(),
       });
     } catch (emailError) {
-      // Error is already logged as 'Email delivery failed' inside the service function
+      // Internal email error (already logged inside the service helper)
     }
 
     return NextResponse.json(
@@ -98,9 +105,10 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
+    // Phase 11 & Phase 13: Never expose internal/Prisma errors
     console.error('[/api/contact] Unhandled error:', error);
     return NextResponse.json(
-      { success: false, error: 'Service temporarily unavailable. Please try again later or contact us directly.' },
+      { success: false, error: 'Service temporarily unavailable. Please try again later.' },
       { status: 500 }
     );
   }
